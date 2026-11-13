@@ -1,0 +1,999 @@
+<title>AgriBond</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Hanken+Grotesk:wght@400..700&display=swap">
+<style>
+/* Layout: responsive web app. Sticky top bar + main column with a 340px rail on desktop; bottom tab bar on phones. */
+:root{
+  --paper:#f2f5ed;--surface:#ffffff;--raised:#f8faf4;--ink:#16261b;--ink2:#41564a;--muted:#6a7d6f;--hair:#dbe3d5;
+  --brand:#2b6a39;--brand-d:#1d4a28;--brand-t:#e0eede;--on-brand:#ffffff;
+  --wheat:#bf8318;--wheat-t:#fbf0d7;
+  --ok:#1d8749;--ok-t:#e0f2e7;--warn:#a5620e;--warn-t:#fbeed6;--bad:#af3838;--bad-t:#fbe7e7;--info:#27608a;--info-t:#e1edf6;
+  --hero:#1c3f26;--hero-ink:#eef5ea;--hero-mute:#b8cfbb;
+  --shadow:0 1px 2px rgba(22,38,27,.06),0 3px 16px rgba(22,38,27,.05);
+  --fd:"Bricolage Grotesque",Georgia,"Times New Roman",serif;
+  --fb:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0e1610;--surface:#162019;--raised:#1b271e;--ink:#e6efe7;--ink2:#b3c4b7;--muted:#8a9e8f;--hair:#293829;
+  --brand:#74c180;--brand-d:#9bd6a5;--brand-t:#1c3322;--on-brand:#0e1610;
+  --wheat:#e2a840;--wheat-t:#3a2d12;
+  --ok:#5fcb89;--ok-t:#16301f;--warn:#e8a755;--warn-t:#3a2c12;--bad:#f08c8c;--bad-t:#3b1c1c;--info:#7fb8e1;--info-t:#162b3a;
+  --hero:#12291a;--shadow:0 1px 2px rgba(0,0,0,.4);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0e1610;--surface:#162019;--raised:#1b271e;--ink:#e6efe7;--ink2:#b3c4b7;--muted:#8a9e8f;--hair:#293829;
+  --brand:#74c180;--brand-d:#9bd6a5;--brand-t:#1c3322;--on-brand:#0e1610;
+  --wheat:#e2a840;--wheat-t:#3a2d12;
+  --ok:#5fcb89;--ok-t:#16301f;--warn:#e8a755;--warn-t:#3a2c12;--bad:#f08c8c;--bad-t:#3b1c1c;--info:#7fb8e1;--info-t:#162b3a;
+  --hero:#12291a;--shadow:0 1px 2px rgba(0,0,0,.4);color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--fb);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));min-height:100vh}
+h1,h2,h3,h4{font-family:var(--fd);font-weight:650;margin:0 0 .4em;color:var(--ink);letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:17px}h3{font-size:15px}
+p{margin:0 0 .6em}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;width:100%}
+.mono{font-family:var(--mono);font-size:12.5px}
+.mute{color:var(--muted)}.small{font-size:13px}.tiny{font-size:12px}
+.num{font-variant-numeric:tabular-nums}
+.hide{display:none!important}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sp{flex:1}
+.eyebrow{font-size:12px;font-weight:650;letter-spacing:.09em;text-transform:uppercase;color:var(--brand);margin-bottom:6px}
+
+/* top bar */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--surface);z-index:60}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--surface);border-bottom:1px solid var(--hair);margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:0 max(16px,env(safe-area-inset-left,0px))}
+.tb{display:flex;align-items:center;gap:18px;height:58px}
+.brand{display:flex;align-items:center;gap:8px;font-family:var(--fd);font-weight:750;font-size:19px;text-decoration:none;color:var(--brand-d)}
+.brand svg{width:24px;height:24px;color:var(--brand)}
+.tnav{display:flex;gap:2px;flex:1}
+.tnav a{padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:550;color:var(--ink2);font-size:14.5px}
+.tnav a:hover{background:var(--raised)}
+.tnav a.on{background:var(--brand-t);color:var(--brand-d)}
+.tb-r{display:flex;align-items:center;gap:10px;margin-left:auto}
+.planpill{font-size:12px;font-weight:650;padding:3px 10px;border-radius:99px;text-decoration:none;background:var(--raised);border:1px solid var(--hair);color:var(--ink2)}
+.planpill.pro{background:var(--wheat-t);color:var(--wheat);border-color:transparent}
+.seg{display:inline-flex;background:var(--raised);border:1px solid var(--hair);border-radius:99px;padding:2px}
+.seg button{border:0;background:none;padding:5px 12px;border-radius:99px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
+.seg button.on{background:var(--brand);color:var(--on-brand)}
+.iconbtn{position:relative;width:36px;height:36px;border-radius:50%;border:1px solid var(--hair);background:var(--surface);display:grid;place-items:center;cursor:pointer;color:var(--ink2)}
+.iconbtn:hover{background:var(--raised)}
+.iconbtn svg,.ico{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.iconbtn i{position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;border-radius:9px;background:var(--bad);color:#fff;font-size:10.5px;font-style:normal;font-weight:700;display:grid;place-items:center;padding:0 4px}
+.avatar{width:36px;height:36px;border-radius:50%;border:0;background:var(--brand);color:var(--on-brand);font-weight:700;font-size:13px;cursor:pointer}
+.pop-wrap{position:relative}
+.pop{position:absolute;right:0;top:44px;width:340px;max-width:calc(100vw - 32px);background:var(--surface);border:1px solid var(--hair);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.18);z-index:70;overflow:hidden}
+.pop-h{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--hair);font-weight:650}
+.pop-i{display:block;padding:11px 14px;border-bottom:1px solid var(--hair);text-decoration:none;font-size:13.5px;cursor:pointer}
+.pop-i:last-child{border:0}.pop-i:hover{background:var(--raised)}
+.pop-i.unread{background:var(--brand-t)}
+.pop-i small{display:block;color:var(--muted);margin-top:2px}
+.pop button.pi{display:block;width:100%;text-align:left;border:0;background:none;padding:11px 14px;cursor:pointer}
+.pop button.pi:hover{background:var(--raised)}
+
+/* page */
+.page{padding-block:26px 90px}
+.sec-h{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.sec-h h1{font-size:28px;margin:0 0 2px}
+.page-sub{color:var(--ink2);margin:0}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+.rail{display:flex;flex-direction:column;gap:16px;min-width:0}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--hair);border-radius:var(--r);box-shadow:var(--shadow);padding:18px;min-width:0}
+.card.flat{box-shadow:none}
+.card>h2:first-child{margin-bottom:12px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}
+.stat{background:var(--surface);border:1px solid var(--hair);border-radius:var(--r);padding:14px 16px;min-width:0}
+.stat span{font-size:13px;color:var(--muted);display:block}
+.stat b{display:block;font-family:var(--fd);font-size:26px;font-weight:650;margin-top:2px;font-variant-numeric:tabular-nums}
+.stat.warn b{color:var(--warn)}.stat.ok b{color:var(--ok)}.stat.bad b{color:var(--bad)}
+
+/* buttons / forms */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1.5px solid var(--brand);background:var(--brand);color:var(--on-brand);border-radius:9px;padding:9px 15px;font-weight:650;font-size:14px;cursor:pointer;text-decoration:none;line-height:1.2}
+.btn:hover{filter:brightness(1.07)}
+.btn.sec{background:transparent;color:var(--brand-d)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--ink2)}
+.btn.danger{background:transparent;color:var(--bad);border-color:var(--bad)}
+.btn.wide{width:100%}
+.btn.sm{padding:6px 11px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
+label.f{display:block;font-size:13px;font-weight:600;color:var(--ink2);margin-bottom:12px}
+label.f>span.hint{font-weight:400;color:var(--muted)}
+input[type=text],input[type=tel],input[type=number],input[type=date],input[type=search],select,textarea{width:100%;margin-top:5px;padding:10px 12px;border:1px solid var(--hair);border-radius:9px;background:var(--surface);font-size:15px}
+textarea{resize:vertical;min-height:70px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.err{color:var(--bad);font-size:13px;margin:4px 0 8px;min-height:1px}
+.chk{display:flex;gap:9px;align-items:flex-start;font-size:13.5px;margin:6px 0 12px}
+.chk input{margin-top:3px}
+
+/* badges */
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:650;padding:3px 9px;border-radius:99px;background:var(--brand-t);color:var(--brand-d);white-space:nowrap}
+.badge.warn{background:var(--warn-t);color:var(--warn)}.badge.ok{background:var(--ok-t);color:var(--ok)}
+.badge.bad{background:var(--bad-t);color:var(--bad)}.badge.info{background:var(--info-t);color:var(--info)}
+.badge.gray{background:var(--raised);color:var(--muted);border:1px solid var(--hair)}
+.demo{font-size:11px;font-weight:650;padding:2px 8px;border-radius:99px;background:var(--wheat-t);color:var(--wheat);letter-spacing:.02em}
+
+/* ledger table */
+.tblw{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{text-align:left;font-size:12px;font-weight:650;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;border-bottom:1px solid var(--hair);white-space:nowrap}
+.tbl td{padding:12px 10px;border-bottom:1px solid var(--hair);vertical-align:middle}
+.tbl tr.click{cursor:pointer}.tbl tr.click:hover td{background:var(--raised)}
+.tbl tr:last-child td{border-bottom:0}
+.tbl .r{text-align:right}
+.you{color:var(--brand-d);font-weight:650}
+.empty{text-align:center;padding:32px 12px;color:var(--ink2)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--hair);background:var(--surface);border-radius:99px;padding:5px 13px;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink2)}
+.chip.on{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+
+/* kv, timeline */
+.kv{display:flex;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px dashed var(--hair);font-size:14px}
+.kv:last-child{border:0}.kv span:first-child{color:var(--muted)}.kv span:last-child{text-align:right;font-weight:550}
+.steps{list-style:none;margin:6px 0 0;padding:0}
+.steps li{display:flex;gap:12px;align-items:flex-start;padding-bottom:16px;position:relative;font-size:14px}
+.steps li:not(:last-child)::before{content:"";position:absolute;left:11px;top:25px;bottom:-1px;width:2px;background:var(--hair)}
+.steps li.done:not(:last-child)::before{background:var(--brand)}
+.dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--hair);flex:none;display:grid;place-items:center;background:var(--surface);color:var(--on-brand)}
+.dot svg{width:13px;height:13px;stroke-width:3}
+.done .dot{background:var(--brand);border-color:var(--brand)}
+.cur .dot{border-color:var(--brand);box-shadow:0 0 0 4px var(--brand-t)}
+.steps .t{font-weight:600}
+.callout{border-radius:10px;padding:11px 13px;font-size:13.5px;display:flex;gap:10px;align-items:flex-start}
+.callout svg{margin-top:2px}
+.callout.lock{background:var(--brand-t);color:var(--brand-d)}
+.callout.warn{background:var(--warn-t);color:var(--warn)}
+.callout.bad{background:var(--bad-t);color:var(--bad)}
+.callout.info{background:var(--info-t);color:var(--info)}
+.callout.ok{background:var(--ok-t);color:var(--ok)}
+.next{border:1.5px solid var(--brand);background:linear-gradient(0deg,var(--brand-t),var(--brand-t)),var(--surface)}
+.next h2{margin-bottom:4px}
+.hash{word-break:break-all;background:var(--raised);border:1px solid var(--hair);border-radius:8px;padding:8px 10px;margin:8px 0}
+.demo-box{border:1.5px dashed var(--hair);border-radius:var(--r);padding:14px}
+.demo-box h3{display:flex;gap:8px;align-items:center}
+
+/* score ring + bars */
+.ring{position:relative;width:96px;height:96px;flex:none}
+.ring svg{width:96px;height:96px;transform:rotate(-90deg)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--fd);font-size:28px;font-weight:700}
+.bar{height:8px;border-radius:4px;background:var(--hair);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--brand);border-radius:4px}
+.bar i.w{background:var(--wheat)}
+.meter{margin:10px 0}.meter .row{justify-content:space-between;font-size:13.5px;margin-bottom:4px;gap:6px}
+
+/* activity */
+.day{font-size:12px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px}
+.day:first-child{margin-top:0}
+.act{display:flex;gap:10px;padding:6px 0;font-size:13.5px}
+.act i{width:8px;height:8px;border-radius:50%;background:var(--brand);margin-top:7px;flex:none}
+.act i.s{background:var(--muted)}.act i.b{background:var(--wheat)}
+.act time{color:var(--muted);font-size:12px;margin-left:auto;white-space:nowrap;padding-left:8px}
+
+/* ads / scheme */
+.ad{border:1px dashed var(--hair);border-radius:var(--r);padding:14px;background:var(--raised);font-size:13.5px}
+.ad .tag{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:650}
+.scheme{padding:14px 0;border-bottom:1px solid var(--hair)}
+.scheme:last-child{border:0}
+.scheme h3{margin:0}
+.scheme .src{font-size:12.5px;color:var(--muted);margin-top:6px}
+.scheme .src a{color:var(--info)}
+.srcs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.srcs a{font-size:12px;padding:3px 9px;border-radius:99px;border:1px solid var(--hair);text-decoration:none;color:var(--info)}
+
+/* plan */
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.plan{border:1.5px solid var(--hair);border-radius:var(--r);padding:20px;background:var(--surface)}
+.plan.cur{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-t)}
+.plan ul{list-style:none;padding:0;margin:12px 0 16px}
+.plan li{display:flex;gap:8px;padding:5px 0;font-size:14px}
+.plan li svg{color:var(--ok);margin-top:3px}
+.plan .price{font-family:var(--fd);font-size:30px;font-weight:700}
+
+/* chart */
+.chart{width:100%;height:auto;display:block}
+.chart text{font-family:var(--fb);fill:var(--muted);font-size:11px}
+.chart .lbl{fill:var(--ink);font-weight:600;paint-order:stroke;stroke:var(--surface);stroke-width:3px}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--paper);border-radius:8px;padding:6px 9px;font-size:12px;white-space:nowrap;z-index:5;transform:translate(-50%,-110%)}
+.cw{position:relative}
+
+/* modal */
+.mback{position:fixed;inset:0;background:rgba(10,20,12,.55);z-index:80;display:grid;place-items:center;padding:16px;overflow-y:auto}
+.modal{background:var(--surface);border-radius:14px;width:100%;max-width:520px;max-height:calc(100vh - 32px);overflow-y:auto;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.modal.big{max-width:680px}
+.modal h2{font-size:20px;margin-bottom:12px}
+.mact{display:flex;gap:10px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}
+.ai-card{border:1px solid var(--hair);background:var(--raised);border-radius:10px;padding:12px 14px;margin:10px 0;font-size:13.5px}
+.ai-card dl{display:grid;grid-template-columns:auto 1fr;gap:3px 14px;margin:8px 0}
+.ai-card dt{color:var(--muted)}.ai-card dd{margin:0;font-weight:600}
+.fair li{display:flex;gap:8px;margin:6px 0;font-size:13.5px;list-style:none}
+.fair{padding:0;margin:8px 0 0}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid var(--hair);border-top-color:var(--brand);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:99px;font-size:13.5px;opacity:0;transition:.25s;pointer-events:none;z-index:120;max-width:calc(100vw - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* chat */
+.fab{position:fixed;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:55;display:flex;gap:8px;align-items:center;background:var(--brand-d);color:#fff;border:0;border-radius:99px;padding:12px 18px;font-weight:650;box-shadow:0 6px 24px rgba(0,0,0,.25);cursor:pointer}
+:root[data-theme="dark"] .fab{background:var(--brand);color:var(--on-brand)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .fab{background:var(--brand);color:var(--on-brand)}}
+.chatp{position:fixed;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:75;width:380px;max-width:calc(100vw - 32px);height:540px;max-height:calc(100vh - 120px);background:var(--surface);border:1px solid var(--hair);border-radius:16px;box-shadow:0 16px 60px rgba(0,0,0,.3);display:flex;flex-direction:column;overflow:hidden}
+.chath{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;background:var(--brand-d);color:#fff;font-family:var(--fd);font-weight:650}
+:root[data-theme="dark"] .chath{background:var(--brand-t);color:var(--ink)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chath{background:var(--brand-t);color:var(--ink)}}
+.chath button{background:none;border:0;color:inherit;cursor:pointer}
+.chatm{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:88%;padding:9px 12px;border-radius:12px;font-size:14px;white-space:pre-wrap}
+.msg.u{align-self:flex-end;background:var(--brand);color:var(--on-brand);border-bottom-right-radius:3px}
+.msg.a{align-self:flex-start;background:var(--raised);border:1px solid var(--hair);border-bottom-left-radius:3px}
+.chatq{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 8px}
+.chatq button{border:1px solid var(--hair);background:var(--surface);border-radius:99px;font-size:12.5px;padding:4px 11px;cursor:pointer;color:var(--ink2)}
+.chati{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--hair)}
+.chati input{margin:0}
+
+/* landing */
+.lp{margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)))}
+.lp-in{max-width:1180px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left,0px))}
+.lp-top{display:flex;align-items:center;justify-content:space-between;height:64px}
+.hero{background:var(--hero);color:var(--hero-ink);padding-bottom:56px}
+.hero .brand{color:var(--hero-ink)}.hero .brand svg{color:#9bd6a5}
+.hero-g{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:44px;align-items:center;padding-top:28px}
+.hero h1{font-size:clamp(34px,5vw,56px);line-height:1.04;color:var(--hero-ink);margin-bottom:16px}
+.hero .lede{font-size:18px;color:var(--hero-mute);max-width:520px}
+.hero .btn.l{background:#eef5ea;border-color:#eef5ea;color:#1c3f26}
+.hero .btn.o{background:transparent;color:var(--hero-ink);border-color:rgba(238,245,234,.45)}
+.hero .fine{color:var(--hero-mute);font-size:13px;margin-top:14px}
+.board{background:var(--surface);color:var(--ink);border-radius:14px;padding:6px 18px 14px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.board-h{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--hair);font-size:13px;color:var(--muted)}
+.board-h strong{color:var(--ink);font-family:var(--fd);font-size:15px}
+.brow{padding:12px 0;border-bottom:1px solid var(--hair)}
+.brow:last-child{border:0;padding-bottom:0}
+.brow .t{display:flex;justify-content:space-between;gap:10px;font-weight:600;font-size:14px}
+.brow .s{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:12.5px;margin:2px 0 8px}
+.run{height:6px;border-radius:3px;background:var(--hair);overflow:hidden}
+.run i{display:block;height:100%;background:var(--brand);border-radius:3px}
+.run.warn i{background:var(--wheat)}.run.bad i{background:var(--bad)}
+.lp-sec{padding:64px 0 0}
+.lp-sec h2{font-size:clamp(26px,3.4vw,36px);margin-bottom:22px;max-width:640px}
+.bento{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}
+.tile{grid-column:span 2;background:var(--surface);border:1px solid var(--hair);border-radius:14px;padding:22px}
+.tile.w{grid-column:span 3}.tile.t{background:var(--brand-t);border-color:transparent}
+.tile.d{background:var(--hero);border-color:transparent;color:var(--hero-ink)}.tile.d h3{color:var(--hero-ink)}.tile.d p{color:var(--hero-mute)}
+.tile h3{font-size:18px}.tile p{color:var(--ink2);margin-bottom:10px}
+.how{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;counter-reset:s}
+.how div{border-top:3px solid var(--brand);padding-top:12px}
+.how b{font-family:var(--fd);font-size:17px;display:block;margin-bottom:4px}
+.how p{color:var(--ink2);font-size:14px}
+.lp-cta{margin-top:64px;background:var(--brand-t);border-radius:16px;padding:40px 24px;text-align:center}
+.lp-cta h2{margin:0 auto 18px;max-width:560px;font-size:clamp(24px,3vw,32px)}
+.lp-foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:28px 0 36px;color:var(--muted);font-size:13px}
+
+/* auth */
+.auth{max-width:520px;margin:0 auto;padding:30px 0 60px}
+.roles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0 18px}
+.role{border:1.5px solid var(--hair);border-radius:12px;padding:14px;background:var(--surface);cursor:pointer;text-align:left}
+.role.on{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-t)}
+.role b{display:block;font-family:var(--fd);font-size:16px}.role span{font-size:13px;color:var(--muted)}
+
+/* tab bar */
+.tabbar{display:none}
+@media (max-width:980px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .stats{grid-template-columns:1fr 1fr}
+  .hero-g{grid-template-columns:minmax(0,1fr);gap:30px}
+  .bento .tile,.bento .tile.w{grid-column:span 3}
+  .how{grid-template-columns:1fr 1fr}
+}
+@media (max-width:720px){
+  .tnav{display:none}
+  .tb{gap:8px}.tb-r{gap:7px}
+  .planpill{display:none}
+  .seg button{padding:5px 9px;font-size:12.5px}
+  .page{padding-block:18px 100px}
+  .sec-h h1{font-size:24px}
+  .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--surface);border-top:1px solid var(--hair);padding:6px max(6px,env(safe-area-inset-left,0px)) calc(6px + env(safe-area-inset-bottom,0px))}
+  .tabbar a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:10px;font-size:11px;text-decoration:none;color:var(--muted);font-weight:600}
+  .tabbar a.on{background:var(--brand-t);color:var(--brand-d)}
+  .tabbar svg{width:20px;height:20px}
+  .tbl thead{display:none}
+  .tbl,.tbl tbody,.tbl tr,.tbl td{display:block}
+  .tbl tr{padding:12px 4px;border-bottom:1px solid var(--hair)}
+  .tbl td{padding:2px 0;border:0}
+  .tbl td[data-l]::before{content:attr(data-l) ": ";color:var(--muted);font-size:12px}
+  .tbl .r{text-align:left}
+  .plans,.fgrid{grid-template-columns:1fr}
+  .bento .tile,.bento .tile.w{grid-column:span 6}
+  .how{grid-template-columns:1fr}
+  .fab{bottom:calc(76px + env(safe-area-inset-bottom,0px));padding:11px 15px}
+  .fab span{display:none}
+  .chatp{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+  .stat b{font-size:22px}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+<div id="app"></div>
+<div id="modal"></div>
+<div id="chat"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>
+/* ============ helpers ============ */
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const inr=n=>"₹"+Math.round(n).toLocaleString("en-IN");
+const DAY=864e5,HR=36e5;
+const dAt=n=>Date.now()+n*DAY;
+const sod=t=>{const x=new Date(t);x.setHours(0,0,0,0);return x.getTime()};
+const dd=t=>Math.round((sod(t)-sod(Date.now()))/DAY);
+const fdate=t=>new Date(t).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"});
+const fshort=t=>new Date(t).toLocaleDateString("en-IN",{day:"numeric",month:"short"});
+const ftime=t=>new Date(t).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"});
+const relDays=n=>n<0?`${-n}d overdue`:n===0?"today":n===1?"tomorrow":`in ${n}d`;
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const sum=a=>a.reduce((x,y)=>x+y,0);
+
+const IC={
+ home:"M3 11l9-8 9 8M5 10v10h14V10",file:"M6 2h9l5 5v15H6zM14 2v6h6M9 13h6M9 17h6",chart:"M3 3v18h18M7 15l4-5 3 3 5-7",
+ landmark:"M3 10l9-6 9 6M5 10v8M10 10v8M14 10v8M19 10v8M3 21h18",shield:"M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM9 12l2 2 4-4",
+ bell:"M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7M10 20a2 2 0 0 0 4 0",chat:"M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z",
+ check:"M5 12l5 5 9-10",lock:"M6 11h12v10H6zM8 11V7a4 4 0 0 1 8 0v4",truck:"M2 6h12v10H2zM14 9h4l3 3v4h-7M7 19a2 2 0 1 0 .01 0M17 19a2 2 0 1 0 .01 0",
+ rupee:"M7 5h10M7 9h10M7 5c6 0 6 8 0 8H7l8 7",alert:"M12 3l10 18H2zM12 10v5M12 18v.01",plus:"M12 5v14M5 12h14",
+ search:"M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-5-5",sound:"M4 9v6h4l5 4V5L8 9zM16 9a4 4 0 0 1 0 6",x:"M6 6l12 12M18 6L6 18",
+ user:"M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 4-6 8-6s8 2 8 6",arrow:"M5 12h14M13 6l6 6-6 6",
+ wheat:"M12 22V8M12 8c-3 0-5-2-5-5 3 0 5 2 5 5zM12 8c3 0 5-2 5-5-3 0-5 2-5 5zM12 15c-3 0-5-2-5-5M12 15c3 0 5-2 5-5",
+ scan:"M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M4 12h16",
+ copy:"M9 9h11v11H9zM5 15H4V4h11v1",info:"M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 11v5M12 8v.01",
+ scale:"M12 3v18M5 7h14M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z",users:"M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 20c0-3 3-5 6-5s6 2 6 5M16 5a3 3 0 0 1 0 6M18 15c2 .6 3 2.3 3 5"
+};
+const ic=(n,c="")=>`<svg class="ico ${c}" viewBox="0 0 24 24" aria-hidden="true"><path d="${IC[n]||""}"/></svg>`;
+const logo=()=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${IC.wheat}"/></svg>`;
+
+/* sync SHA-256 (for the tamper-evident contract fingerprint) */
+const sha256=(()=>{const K=[],H0=[];let n=2,c=0;while(c<64){let p=true;for(let i=2;i*i<=n;i++)if(n%i===0){p=false;break}
+ if(p){if(c<8)H0.push((Math.pow(n,.5)%1)*4294967296|0);K.push((Math.pow(n,1/3)%1)*4294967296|0);c++}n++}
+ const rr=(x,k)=>(x>>>k)|(x<<(32-k));
+ return s=>{const b=[...unescape(encodeURIComponent(s))].map(ch=>ch.charCodeAt(0)),l=b.length*8;b.push(128);while(b.length%64!==56)b.push(0);
+  for(let i=7;i>=0;i--)b.push(i>=4?0:(l>>>(i*8))&255);
+  const H=H0.slice();
+  for(let o=0;o<b.length;o+=64){const w=[];for(let i=0;i<16;i++)w[i]=(b[o+4*i]<<24)|(b[o+4*i+1]<<16)|(b[o+4*i+2]<<8)|b[o+4*i+3];
+   for(let i=16;i<64;i++){const s0=rr(w[i-15],7)^rr(w[i-15],18)^(w[i-15]>>>3),s1=rr(w[i-2],17)^rr(w[i-2],19)^(w[i-2]>>>10);w[i]=(w[i-16]+s0+w[i-7]+s1)|0}
+   let[a,bb,cc,d,e,f,g,h]=H;
+   for(let i=0;i<64;i++){const S1=rr(e,6)^rr(e,11)^rr(e,25),ch=(e&f)^(~e&g),t1=(h+S1+ch+K[i]+w[i])|0,S0=rr(a,2)^rr(a,13)^rr(a,22),mj=(a&bb)^(a&cc)^(bb&cc),t2=(S0+mj)|0;
+    h=g;g=f;f=e;e=(d+t1)|0;d=cc;cc=bb;bb=a;a=(t1+t2)|0}
+   [a,bb,cc,d,e,f,g,h].forEach((v,i)=>H[i]=(H[i]+v)|0)}
+  return H.map(x=>(x>>>0).toString(16).padStart(8,"0")).join("")}})();
+
+/* ============ reference data (illustrative) ============ */
+const CROPS={
+ "Wheat":{hi:"गेहूं",base:2655,vol:.004,msp:2585,season:"Rabi 2026-27"},
+ "Mustard":{hi:"सरसों",base:6380,vol:.005,msp:6200,season:"Rabi 2026-27"},
+ "Chickpea":{hi:"चना",base:5920,vol:.005,msp:5875,season:"Rabi 2026-27"},
+ "Paddy (Common)":{hi:"धान",base:2410,vol:.004,msp:2369,season:"Kharif 2025-26"},
+ "Basmati Paddy":{hi:"बासमती धान",base:3920,vol:.006,msp:null},
+ "Maize":{hi:"मक्का",base:2290,vol:.005,msp:2400,season:"Kharif 2025-26"},
+ "Potato":{hi:"आलू",base:1180,vol:.012,msp:null}
+};
+const MSP_SRC="https://static.pib.gov.in/WriteReadData/specificdocs/documents/2025/oct/doc20251010662401.pdf";
+const MANDIS=[["Panipat",0],["Karnal",.012],["Ambala",-.008],["Azadpur, Delhi",.025],["Hisar",-.015]];
+const _ms={};
+function mseries(crop){
+ if(_ms[crop])return _ms[crop];const C=CROPS[crop];
+ let s=[...crop].reduce((a,ch)=>(a*31+ch.charCodeAt(0))>>>0,7)%2147483646+1;
+ const r=()=>(s=s*16807%2147483647)/2147483647;
+ let p=C.base*(1+(r()-.5)*.05);const a=[];
+ for(let i=0;i<30;i++){p+=(C.base-p)*.12+(r()-.5)*2*C.vol*C.base;a.push(p)}
+ const off=C.base-a[29];return _ms[crop]=a.map(v=>Math.round((v+off)/5)*5);
+}
+const BASE_PEOPLE={
+ F1:{id:"F1",type:"farmer",name:"Ramesh Kumar",place:"Panipat, Haryana",mobile:"98xxxxxx21",kyc:true,since:2023,stats:{completed:7,onTime:96}},
+ F2:{id:"F2",type:"farmer",name:"Gurmeet Singh",place:"Karnal, Haryana",mobile:"98xxxxxx48",kyc:true,since:2022,stats:{completed:5,onTime:91}},
+ F3:{id:"F3",type:"farmer",name:"Sunita Devi",place:"Kaithal, Haryana",mobile:"97xxxxxx05",kyc:true,since:2024,stats:{completed:3,onTime:88}},
+ F4:{id:"F4",type:"farmer",name:"Mohan Lal",place:"Jind, Haryana",mobile:"98xxxxxx77",kyc:true,since:2021,stats:{completed:11,onTime:94}},
+ B1:{id:"B1",type:"buyer",name:"Shree Agro Mills",place:"Karnal, Haryana",mobile:"01xxxxxx90",kyc:true,since:2021,gst:"06AAXXX1234Z1ZP",stats:{completed:18,onTime:97}},
+ B2:{id:"B2",type:"buyer",name:"Kisan Oilseeds Pvt Ltd",place:"Hisar, Haryana",mobile:"01xxxxxx12",kyc:true,since:2020,gst:"06AAXXX5678Q1ZK",stats:{completed:12,onTime:92}},
+ B3:{id:"B3",type:"buyer",name:"Haryana Rice Exports",place:"Karnal, Haryana",mobile:"01xxxxxx33",kyc:true,since:2019,gst:"06AAXXX9012M1ZB",stats:{completed:9,onTime:95}},
+ B4:{id:"B4",type:"buyer",name:"FreshMart Retail",place:"Gurugram, Haryana",mobile:"01xxxxxx64",kyc:true,since:2024,gst:"06AAXXX3456L1ZD",stats:{completed:4,onTime:81}}
+};
+const SCHEMES=[
+ {id:"pmk",name:"PM-KISAN",cat:"Income support",desc:"Direct income support for landholding farmer families.",benefit:"₹6,000 a year, paid in three instalments to eligible families.",src:"pmkisan.gov.in",url:"https://pmkisan.gov.in/",rule:p=>p.land>0?1:0},
+ {id:"pmfby",name:"PM Fasal Bima Yojana",cat:"Crop insurance",desc:"Insurance cover against yield loss from weather, pests and disease.",benefit:"Farmer premium is capped at 2% (kharif), 1.5% (rabi) and 5% (commercial crops).",src:"pmfby.gov.in",url:"https://pmfby.gov.in/",rule:p=>p.land>0?1:0},
+ {id:"kcc",name:"Kisan Credit Card",cat:"Credit",desc:"Short-term crop loans at a subsidised interest rate with a prompt-repayment benefit.",benefit:"Revolving credit for seed, fertiliser and labour. Limits and rates depend on the bank.",src:"myscheme.gov.in",url:"https://www.myscheme.gov.in/",rule:p=>p.land>0?1:0},
+ {id:"enam",name:"e-NAM",cat:"Market access",desc:"National online mandi network. Lets you sell to buyers beyond your local market.",benefit:"Wider buyer reach and online price discovery at registered mandis.",src:"enam.gov.in",url:"https://enam.gov.in/",rule:p=>1},
+ {id:"aif",name:"Agriculture Infrastructure Fund",cat:"Storage and processing",desc:"Loans for warehouses, cold storage and primary processing.",benefit:"Interest subvention on eligible loans for post-harvest infrastructure.",src:"agriinfra.dac.gov.in",url:"https://agriinfra.dac.gov.in/",rule:p=>p.land>=4?1:2},
+ {id:"kusum",name:"PM-KUSUM",cat:"Energy",desc:"Subsidy support for solar irrigation pumps and grid-connected solar.",benefit:"Central and state support toward solar pump cost. Varies by state.",src:"pmkusum.mnre.gov.in",url:"https://pmkusum.mnre.gov.in/",rule:p=>p.land>=2?1:2},
+ {id:"shc",name:"Soil Health Card",cat:"Inputs",desc:"Free soil testing with crop-wise nutrient advice.",benefit:"Lower input cost through balanced fertiliser use.",src:"soilhealth.dac.gov.in",url:"https://soilhealth.dac.gov.in/",rule:p=>p.land>0?1:0}
+];
+const REASONS={buyer:["Quality below agreed spec","Quantity short","Delivered late","Wrong grade or variety"],farmer:["Payment delayed","Buyer rejected without a valid reason","Weight does not match weighbridge slip","Terms changed after signing"]};
+const STAGES=["Contract signed and locked","Escrow funded","Dispatched","In transit","Delivered and weighed","Quality confirmed, payment released"];
+
+/* ============ state ============ */
+const LS="agribond.advanced.v1";
+let S=null;
+const L=(ts,who,text)=>({ts,who,text});
+function terms(c){return JSON.stringify([c.id,c.crop,c.grade,c.qty,c.price,c.farmerId,c.buyerId,fdate(c.deliverBy),c.payTerms,c.advancePct,c.quality,c.place])}
+function lockSeed(c,stage,t0){
+ const v=c.qty*c.price,adv=Math.round(v*c.advancePct/100);
+ if(stage>=1){c.sig.f=dAt(t0);c.sig.b=dAt(t0)+2*HR;c.stage=1;c.times[1]=c.sig.b;c.lockedAt=c.sig.b;c.lockedHash=sha256(terms(c));
+  c.log.push(L(c.sig.f,"F","Farmer signed the contract"),L(c.sig.b,"B","Buyer signed the contract"),L(c.sig.b,"sys","Terms locked and fingerprinted"))}
+ if(stage>=2){c.stage=2;c.times[2]=dAt(t0+1);c.escrow.held=v;c.log.push(L(c.times[2],"B",`Escrow funded ${inr(v)}`));c.tx.push({ts:c.times[2],label:"Escrow funded by buyer",amt:v,dir:"in"})}
+ if(stage>=3){c.stage=3;c.times[3]=dAt(t0+3);c.vehicle={no:"HR 06 AB "+(4000+c.id.slice(-2)*7),driver:"Sukhdev Singh"};c.escrow.held-=adv;c.escrow.released+=adv;
+  c.log.push(L(c.times[3],"F","Marked dispatched. Advance released"));c.tx.push({ts:c.times[3],label:`Advance ${c.advancePct}% released to farmer`,amt:adv,dir:"out"})}
+ if(stage>=4){c.stage=4;c.times[4]=dAt(t0+4);c.log.push(L(c.times[4],"sys","Vehicle crossed Kundli toll (GPS update)"))}
+ if(stage>=5){c.stage=5;c.times[5]=c.dispute?dAt(t0+6):dAt(-1)+3*HR;const w=Math.round(c.qty*.985*10)/10;c.delivery={weighed:w,moisture:11.6,at:c.times[5]};c.final=Math.round(w*c.price);
+  c.log.push(L(c.times[5],"B",`Received and weighed: ${w} q, moisture 11.6%`))}
+ if(stage>=6){c.stage=6;c.times[6]=dAt(t0+7);c.final=v;c.delivery={weighed:c.qty,moisture:11.2,at:dAt(t0+6)};const pay=v-c.escrow.released;c.escrow.released=v;c.escrow.held=0;c.rated=5;
+  c.log.push(L(dAt(t0+6),"B",`Received and weighed: ${c.qty} q`),L(c.times[6],"B","Confirmed quality. Payment released"));c.tx.push({ts:c.times[6],label:"Final payment released to farmer",amt:pay,dir:"out"})}
+}
+function seed(){
+ const C=[];
+ const add=(o,stage,t0)=>{const c={sig:{f:null,b:null},stage:0,escrow:{held:0,released:0,refunded:0},times:{},vehicle:null,delivery:null,dispute:null,final:null,rated:null,log:[],tx:[],advancePct:20,payTerms:48,grade:"A",quality:"Moisture up to 12%, foreign matter up to 2%",created:dAt(t0-1),...o};
+  lockSeed(c,stage,t0);C.push(c);return c};
+ const A=add({id:"AB-1042",crop:"Wheat",qty:20,price:2650,farmerId:"F1",buyerId:"B1",deliverBy:dAt(12),place:"Panipat Mandi to Shree Agro Mills, Karnal",created:dAt(-1)},0,-1);
+ A.log.push(L(A.created,"B","Shree Agro Mills proposed this contract"));
+ add({id:"AB-1038",crop:"Mustard",qty:12,price:6400,farmerId:"F1",buyerId:"B2",deliverBy:dAt(4),place:"Farm gate to Kisan Oilseeds, Hisar",quality:"Oil content 38% or more, moisture up to 8%"},4,-7);
+ add({id:"AB-1031",crop:"Basmati Paddy",qty:35,price:3900,farmerId:"F1",buyerId:"B3",deliverBy:dAt(-1),place:"Panipat to Haryana Rice Exports, Karnal",grade:"A"},5,-12);
+ const P=add({id:"AB-1024",crop:"Potato",qty:30,price:1150,farmerId:"F1",buyerId:"B4",deliverBy:dAt(-6),place:"Panipat to FreshMart DC, Gurugram",grade:"B",quality:"Size 45 mm or more, no greening"},5,-16);
+ P.dispute={by:"buyer",reason:"Quality below agreed spec",note:"About 15% of tubers show greening.",opened:dAt(-3),stage:1,outcome:null,evidence:["Contract fingerprint","Delivery log","Weighbridge slip","photo_greening.jpg"]};
+ P.log.push(L(P.dispute.opened,"B","Raised an issue: Quality below agreed spec"),L(P.dispute.opened+HR,"sys","Evidence packet compiled and attached"));
+ add({id:"AB-1019",crop:"Maize",qty:18,price:2430,farmerId:"F1",buyerId:"B1",deliverBy:dAt(-26),place:"Panipat to Shree Agro Mills, Karnal",quality:"Moisture up to 14%"},6,-33);
+ add({id:"AB-1036",crop:"Wheat",qty:50,price:2620,farmerId:"F2",buyerId:"B1",deliverBy:dAt(9),place:"Karnal to Shree Agro Mills"},2,-3);
+ add({id:"AB-1033",crop:"Chickpea",qty:25,price:5950,farmerId:"F3",buyerId:"B1",deliverBy:dAt(2),place:"Kaithal to Shree Agro Mills, Karnal",quality:"Moisture up to 10%, broken up to 3%"},4,-8);
+ add({id:"AB-1029",crop:"Wheat",qty:40,price:2600,farmerId:"F4",buyerId:"B1",deliverBy:dAt(-1),place:"Jind to Shree Agro Mills, Karnal"},5,-9);
+ const N=[
+  {to:"farmer",ts:dAt(-1),text:"Shree Agro Mills proposed contract AB-1042 for 20 q Wheat",link:"contract-AB-1042",read:false},
+  {to:"farmer",ts:dAt(-1)+3*HR,text:"AB-1031 delivered to Haryana Rice Exports. Payment releases after quality confirmation",link:"contract-AB-1031",read:false},
+  {to:"farmer",ts:dAt(-3),text:"FreshMart Retail raised an issue on AB-1024 (quality)",link:"contract-AB-1024",read:true},
+  {to:"buyer",ts:dAt(-1),text:"Mohan Lal's AB-1029 was delivered. Confirm quality within 48h",link:"contract-AB-1029",read:false},
+  {to:"buyer",ts:dAt(-2),text:"Sunita Devi's AB-1033 is in transit",link:"contract-AB-1033",read:false},
+  {to:"buyer",ts:dAt(-3),text:"Gurmeet Singh signed AB-1036. Escrow funded",link:"contract-AB-1036",read:true}
+ ].map((n,i)=>({id:i+1,...n}));
+ return{role:null,plan:"free",aiUsed:0,contracts:C,notifs:N,land:6,state:"Haryana",ui:{},chat:{open:false,msgs:[],busy:false}};
+}
+function load(){let d=null;try{d=JSON.parse(localStorage.getItem(LS)||"null")}catch(e){}
+ S=d&&d.contracts?d:seed();S.ui=S.ui||{};S.chat={open:false,msgs:[],busy:false};S.ui.menu=S.ui.bell=false}
+function save(){try{const{chat,...rest}=S;localStorage.setItem(LS,JSON.stringify({...rest,ui:{}}))}catch(e){}}
+function reset(){try{localStorage.removeItem(LS)}catch(e){}S=seed();_scan=null}
+
+/* ============ domain logic ============ */
+const me=()=>BASE_PEOPLE[S.role==="buyer"?"B1":"F1"];
+const other=c=>BASE_PEOPLE[S.role==="buyer"?c.farmerId:c.buyerId];
+const person=id=>BASE_PEOPLE[id];
+const mine=()=>S.contracts.filter(c=>c.farmerId===me().id||c.buyerId===me().id);
+const byId=id=>S.contracts.find(c=>c.id===id);
+const value=c=>c.final!=null?c.final:c.qty*c.price;
+function status(c){
+ if(c.dispute&&!c.dispute.outcome)return"disputed";
+ if(c.stage>=6)return"completed";if(c.stage===0)return"awaiting";if(c.stage<=2)return"active";if(c.stage<=4)return"transit";return"delivered"}
+const STAT={awaiting:["Awaiting signature","warn"],active:["Signed","info"],transit:["In transit","info"],delivered:["Delivered, verify","warn"],completed:["Completed","ok"],disputed:["Disputed","bad"]};
+const sbadge=c=>{const[l,t]=STAT[status(c)];return`<span class="badge ${t}">${l}</span>`};
+function next(c){
+ if(c.dispute&&!c.dispute.outcome)return{who:"system",key:"dispute",label:"Mediation in progress"};
+ switch(c.stage){
+  case 0:{const p=[];if(!c.sig.f)p.push("farmer");if(!c.sig.b)p.push("buyer");return{who:p.includes(S.role)?S.role:p[0],key:"sign",label:"Sign the contract"}}
+  case 1:return{who:"buyer",key:"fund",label:"Fund escrow"};
+  case 2:return{who:"farmer",key:"dispatch",label:"Mark dispatched"};
+  case 3:return{who:"system",key:"transit",label:"Transit update"};
+  case 4:return{who:"buyer",key:"receive",label:"Receive and weigh"};
+  case 5:return{who:"buyer",key:"confirm",label:"Confirm quality and release payment"};
+ }return null}
+const roleName=r=>r==="farmer"?"Farmer":r==="buyer"?"Buyer":"System";
+function nextText(c){const n=next(c);if(!n)return'<span class="mute">Done</span>';
+ if(n.who===S.role)return`<span class="you">Your turn: ${n.label}</span>`;
+ if(n.who==="system")return`<span class="mute">${n.label}</span>`;
+ return`<span class="mute">Waiting on ${other(c).name.split(" ")[0]}</span>`}
+function dueText(c){
+ const s=status(c);if(s==="completed")return`<span class="mute">Paid ${fshort(c.times[6])}</span>`;
+ if(c.stage>=5)return`Pay by ${fshort(c.times[5]+c.payTerms*HR)}`;
+ const n=dd(c.deliverBy);return`Deliver ${fshort(c.deliverBy)} <span class="mute">(${relDays(n)})</span>`}
+function trustOf(p){
+ const live=S.contracts.filter(c=>c.stage>=6&&(c.farmerId===p.id||c.buyerId===p.id)).length;
+ let lost=0;S.contracts.forEach(c=>{const o=c.dispute&&c.dispute.outcome;if(!o)return;if(o.type==="release"&&c.buyerId===p.id)lost++;if(o.type==="refund"&&c.farmerId===p.id)lost++});
+ const completed=p.stats.completed+live,onTime=p.stats.onTime;
+ const parts={base:38,kyc:p.kyc?12:0,record:Math.min(completed,12)*2,punct:Math.round(onTime*.28),pen:lost*8};
+ const score=clamp(parts.base+parts.kyc+parts.record+parts.punct-parts.pen,0,100);
+ return{score,completed,onTime,lost,parts}}
+function pushLog(c,who,text){c.log.push(L(Date.now(),who,text))}
+function notify(to,text,link){S.notifs.unshift({id:Date.now()+Math.random(),to,ts:Date.now(),text,link,read:false})}
+const otherRole=r=>r==="farmer"?"buyer":"farmer";
+function act(id,key,as,p={}){
+ const c=byId(id);if(!c)return;const n=Date.now(),v=c.qty*c.price,partyName=as==="system"?"System":as==="farmer"?person(c.farmerId).name:person(c.buyerId).name;
+ const who=as==="farmer"?"F":as==="buyer"?"B":"sys";
+ if(key==="sign"){c.sig[as==="farmer"?"f":"b"]=n;pushLog(c,who,`${partyName} signed the contract`);notify(otherRole(as),`${partyName} signed ${c.id}`,"contract-"+c.id);
+  if(c.sig.f&&c.sig.b){c.lockedAt=n;c.lockedHash=sha256(terms(c));c.stage=1;c.times[1]=n;pushLog(c,"sys","Terms locked and fingerprinted. Neither side can edit them");notify("farmer",`${c.id} is locked. Buyer can now fund escrow`,"contract-"+c.id);notify("buyer",`${c.id} is locked. Fund escrow to start dispatch`,"contract-"+c.id)}}
+ if(key==="fund"){c.escrow.held=v;c.stage=2;c.times[2]=n;pushLog(c,"B",`Escrow funded ${inr(v)} (simulated UPI)`);c.tx.push({ts:n,label:"Escrow funded by buyer",amt:v,dir:"in"});notify("farmer",`${c.id}: ${inr(v)} is secured in escrow. You can dispatch`,"contract-"+c.id)}
+ if(key==="dispatch"){c.vehicle={no:p.vehicle,driver:p.driver};const adv=Math.round(v*c.advancePct/100);c.escrow.held-=adv;c.escrow.released+=adv;c.stage=3;c.times[3]=n;
+  pushLog(c,"F",`Dispatched in ${p.vehicle}, driver ${p.driver}`);if(adv)c.tx.push({ts:n,label:`Advance ${c.advancePct}% released to farmer`,amt:adv,dir:"out"});notify("buyer",`${c.id} dispatched. Vehicle ${p.vehicle}`,"contract-"+c.id)}
+ if(key==="transit"){c.stage=4;c.times[4]=n;pushLog(c,"sys","Vehicle crossed Kundli toll (GPS update)");notify("buyer",`${c.id} is in transit`,"contract-"+c.id)}
+ if(key==="receive"){const w=clamp(+p.weighed||c.qty,0.1,c.qty*1.05);c.delivery={weighed:w,moisture:+p.moisture||11.4,at:n};c.final=Math.round(w*c.price);c.stage=5;c.times[5]=n;
+  const have=c.escrow.held+c.escrow.released;if(c.final>have){const top=c.final-have;c.escrow.held+=top;c.tx.push({ts:n,label:"Escrow topped up for extra weight",amt:top,dir:"in"})}
+  pushLog(c,"B",`Received and weighed: ${w} q, moisture ${c.delivery.moisture}%. Final value ${inr(c.final)}`);notify("farmer",`${c.id} delivered and weighed (${w} q). Buyer has ${c.payTerms}h to confirm`,"contract-"+c.id)}
+ if(key==="confirm"){const pay=c.final-c.escrow.released,refund=Math.max(0,c.escrow.held-pay);c.escrow.released+=pay;c.escrow.held=0;c.escrow.refunded=refund;c.stage=6;c.times[6]=n;c.rated=p.rating||null;
+  pushLog(c,as==="system"?"sys":"B",as==="system"?`Auto-released after ${c.payTerms}h with no objection`:"Confirmed quality. Payment released");
+  c.tx.push({ts:n,label:"Final payment released to farmer",amt:pay,dir:"out"});if(refund>0)c.tx.push({ts:n,label:"Unused escrow returned to buyer",amt:refund,dir:"back"});
+  notify("farmer",`${inr(pay)} credited for ${c.id} (UPI ref AB${String(n).slice(-8)})`,"contract-"+c.id)}
+ if(key==="dispute"){c.dispute={by:as,reason:p.reason,note:p.note||"",opened:n,stage:0,outcome:null,evidence:["Contract fingerprint","Delivery log",...(c.delivery?["Weighbridge slip"]:[]),...(p.files||[])]};
+  pushLog(c,who,`Raised an issue: ${p.reason}`);pushLog(c,"sys","Escrow frozen. Evidence packet compiled and attached");notify(otherRole(as),`${partyName} raised an issue on ${c.id}: ${p.reason}`,"contract-"+c.id)}
+ if(key==="dstep"){if(c.dispute.stage<2){c.dispute.stage++;pushLog(c,"sys",c.dispute.stage===1?"Evidence review started":"Mediator assigned. Both sides asked for a response")}}
+ if(key==="resolve"){const t=p.type,total=value(c);const ft=t==="release"?total:t==="partial"?Math.round(total*.9):c.escrow.released;
+  const pay=clamp(ft-c.escrow.released,0,c.escrow.held),refund=c.escrow.held-pay;c.escrow.released+=pay;c.escrow.held=0;c.escrow.refunded=refund;
+  c.dispute.outcome={type:t,amount:ft,at:n};c.stage=6;c.times[6]=n;
+  const txt=t==="release"?"Resolved in favour of the farmer. Full payment released":t==="partial"?"Settled at a 10% price adjustment":"Resolved in favour of the buyer. Remaining escrow refunded";
+  pushLog(c,"sys",txt);if(pay)c.tx.push({ts:n,label:"Settlement paid to farmer",amt:pay,dir:"out"});if(refund>0)c.tx.push({ts:n,label:"Escrow returned to buyer",amt:refund,dir:"back"});
+  notify("farmer",`${c.id}: ${txt}`,"contract-"+c.id);notify("buyer",`${c.id}: ${txt}`,"contract-"+c.id)}
+ save()}
+const ROLEPRON={farmer:"farmer",buyer:"buyer"};
+
+/* fairness / price check (rule based) */
+function priceCheck(crop,price,payHrs,advance,days){
+ const C=CROPS[crop],mk=C.base,out=[];
+ if(!price)return out;
+ if(C.msp){const diff=price-C.msp;out.push(diff<0?{t:"warn",x:`${inr(-diff)} below the MSP of ${inr(C.msp)} (${C.season}). Check this price before you sign.`}:{t:"ok",x:`${inr(diff)} above the MSP of ${inr(C.msp)} (${C.season}).`})}
+ else out.push({t:"info",x:`${crop} has no government MSP. Compare with mandi rates.`});
+ const pct=(price-mk)/mk*100;
+ out.push(Math.abs(pct)<=2?{t:"ok",x:`Within ${Math.abs(pct).toFixed(1)}% of today's mandi rate (${inr(mk)}).`}:pct<0?{t:"warn",x:`${Math.abs(pct).toFixed(1)}% below today's mandi rate of ${inr(mk)}.`}:{t:"ok",x:`${pct.toFixed(1)}% above today's mandi rate of ${inr(mk)}.`});
+ if(payHrs>72)out.push({t:"warn",x:`Payment ${payHrs/24} days after delivery is slower than the usual 48 to 72 hours.`});
+ if(advance===0)out.push({t:"info",x:"No advance. You carry the full cost until delivery."});
+ if(days!=null&&days<3)out.push({t:"warn",x:"Delivery window is under 3 days. Late delivery is the most common dispute."});
+ return out}
+function buildSummary(c,lang){
+ const p=person(c.buyerId);
+ if(lang==="hi")return`अनुबंध ${c.id}। ${c.qty} क्विंटल ${CROPS[c.crop].hi}, ${c.price} रुपये प्रति क्विंटल, कुल ${value(c)} रुपये। खरीदार ${p.name}। डिलीवरी ${fdate(c.deliverBy)} तक। भुगतान डिलीवरी के ${c.payTerms} घंटे के भीतर, एस्क्रो में सुरक्षित।`;
+ return`Contract ${c.id}. ${c.qty} quintal ${c.crop} at ${inr(c.price)} per quintal, total ${inr(value(c))}. Buyer ${p.name}. Deliver by ${fdate(c.deliverBy)}. Payment within ${c.payTerms} hours of delivery, held in escrow.`}
+
+/* ============ assistant (rule-based, labelled demo) ============ */
+function cropIn(q){return Object.keys(CROPS).find(k=>q.toLowerCase().includes(k.toLowerCase().split(" ")[0]))}
+function ask(q){
+ const t=q.toLowerCase(),list=mine(),role=S.role,R={text:"",sources:[]};
+ const m=t.match(/ab-?\s?(\d{4})/);
+ if(m){const c=byId("AB-"+m[1]);if(c&&list.includes(c)){const n=next(c);R.text=`${c.id} is ${STAT[status(c)][0].toLowerCase()}. ${c.qty} q ${c.crop} at ${inr(c.price)}, value ${inr(value(c))}, with ${other(c).name}.\nNext step: ${n?(n.who===role?"your turn, "+n.label.toLowerCase():n.who==="system"?n.label.toLowerCase():"waiting on "+other(c).name):"none, it is complete"}.\nEscrow held ${inr(c.escrow.held)}, paid out ${inr(c.escrow.released)}.`;return R}
+  R.text=`I can't find ${"AB-"+m[1]} in your contracts.`;return R}
+ if(/escrow/.test(t)){R.text="Escrow means the buyer pays into a protected holding account before you dispatch. The money is released to you in two parts: an advance when you dispatch, and the balance when the buyer confirms quality (or automatically after the confirmation window). If there is a dispute, the money stays frozen until it is resolved.\nIn this prototype, payments are simulated.";return R}
+ if(/msp|support price/.test(t)){const k=cropIn(t);if(k&&CROPS[k].msp){R.text=`The MSP I have for ${k} is ${inr(CROPS[k].msp)} per quintal (${CROPS[k].season}). Check PIB for the latest announcement before you rely on it.`}
+  else if(k){R.text=`${k} has no government MSP. Use mandi rates as your reference.`}
+  else R.text=`Reference MSPs in this demo: ${Object.entries(CROPS).filter(([,v])=>v.msp).map(([k,v])=>`${k} ${inr(v.msp)}`).join(", ")}.`;R.sources=[{t:"PIB: Rabi MSP 2026-27",u:MSP_SRC}];return R}
+ if(/price|rate|mandi|market|sell/.test(t)){const k=cropIn(t)||(list[0]&&list[0].crop)||"Wheat",s=mseries(k),ch=(s[29]-s[0])/s[0]*100;
+  R.text=`${k} is around ${inr(s[29])} per quintal at the mandi (demo data). That is ${ch>=0?"up":"down"} ${Math.abs(ch).toFixed(1)}% over 30 days.${CROPS[k].msp?` The MSP is ${inr(CROPS[k].msp)}.`:""}\nOpen the Market page for the chart.`;return R}
+ if(/scheme|subsid|kisan|insurance|loan|credit/.test(t)){if(role==="buyer"){R.text="Scheme matching is for farmers. Switch to the Farmer view to see it.";return R}
+  const ms=SCHEMES.filter(s=>s.rule({land:S.land})===1);R.text=`Based on your profile (${S.land} acres, ${S.state}) these look relevant: ${ms.map(s=>s.name).join(", ")}.\nConfirm eligibility on the official site before applying.`;R.sources=ms.slice(0,4).map(s=>({t:s.src,u:s.url}));return R}
+ if(/dispute|issue|problem|reject|complain/.test(t)){R.text="Either side can report an issue once escrow is funded. Escrow freezes, and the contract fingerprint, delivery log and weighbridge slip are attached automatically. The case goes through evidence review and mediation. Outcomes are full release, a 10% price adjustment, or a refund of the remaining escrow.";return R}
+ if(/trust|score|reliab/.test(t)){const x=trustOf(me());R.text=`Your trust score is ${x.score}/100: ${x.completed} completed contracts, ${x.onTime}% on time, ${x.lost} disputes lost. It rises with on-time completions and falls when a dispute goes against you.`;return R}
+ if(/due|owe|payment|pay|money|receiv|escrow/.test(t)||/pending/.test(t)){
+  const held=sum(list.map(c=>c.escrow.held)),rel=sum(list.map(c=>c.escrow.released)),open=list.filter(c=>status(c)!=="completed");
+  R.text=role==="farmer"?`${inr(held)} is held in escrow for you and ${inr(rel)} has been paid out so far. ${open.length} contract${open.length===1?" is":"s are"} still open.`:`You have ${inr(held)} in escrow and have released ${inr(rel)}. ${open.length} contract${open.length===1?" is":"s are"} still open.`;return R}
+ if(/next|todo|do now|action|attention|urgent|what should/.test(t)){const a=list.filter(c=>{const n=next(c);return n&&n.who===role});
+  R.text=a.length?`You have ${a.length} thing${a.length>1?"s":""} to do:\n`+a.map(c=>`• ${c.id}: ${next(c).label} (${c.crop}, ${c.qty} q)`).join("\n"):"Nothing is waiting on you right now.";return R}
+ if(/hello|hi\b|hey|namaste/.test(t)){R.text=`Namaste ${me().name.split(" ")[0]}. Ask me about your contracts, payments, mandi prices, MSP or schemes.`;return R}
+ R.text="I can help with your contracts (try \"explain AB-1042\"), payments due, mandi prices, MSP, schemes, escrow and disputes. I summarise your own records and don't give legal, tax or financial advice.";return R}
+/* ============ views ============ */
+let lastRoute=null,_scan=null;
+const routeName=()=>(location.hash||"").slice(1);
+const NAV={farmer:[["dashboard","Dashboard","home"],["contracts","Contracts","file"],["market","Market","chart"],["schemes","Schemes","landmark"],["trust","Trust","shield"]],
+ buyer:[["dashboard","Dashboard","home"],["contracts","Contracts","file"],["market","Market","chart"],["trust","Trust","shield"]]};
+const initials=n=>n.split(" ").slice(0,2).map(w=>w[0]).join("").toUpperCase();
+const unread=()=>S.notifs.filter(n=>n.to===S.role&&!n.read).length;
+
+function shell(r,content){
+ const key=r.split("-")[0],m=me(),un=unread();
+ const bell=S.ui.bell?`<div class="pop" role="menu"><div class="pop-h"><span>Notifications</span><button class="btn ghost sm" data-act="readall">Mark all read</button></div>${
+  S.notifs.filter(n=>n.to===S.role).slice(0,8).map(n=>`<a class="pop-i ${n.read?"":"unread"}" href="#${n.link}" data-act="readone" data-id="${n.id}">${esc(n.text)}<small>${ftime(n.ts)}</small></a>`).join("")||'<div class="empty small">Nothing yet</div>'}</div>`:"";
+ const menu=S.ui.menu?`<div class="pop" role="menu" style="width:230px"><div class="pop-i"><b>${esc(m.name)}</b><small>${esc(m.place)}</small></div><a class="pop-i" href="#plan">Plan and billing</a><button class="pi" data-act="reset">Reset demo data</button><button class="pi" data-act="signout">Sign out</button></div>`:"";
+ return`<header class="topbar"><div class="tb">
+  <a class="brand" href="#dashboard">${logo()}AgriBond</a>
+  <nav class="tnav" aria-label="Main">${NAV[S.role].map(([k,l])=>`<a href="#${k}" class="${key===k||(k==="contracts"&&key==="contract")?"on":""}">${l}</a>`).join("")}</nav>
+  <div class="tb-r">
+   <a class="planpill ${S.plan}" href="#plan">${S.plan==="pro"?"Pro":"Free plan"}</a>
+   <div class="seg" role="group" aria-label="Demo view: switch between farmer and buyer"><button data-act="role" data-v="farmer" class="${S.role==="farmer"?"on":""}">Farmer</button><button data-act="role" data-v="buyer" class="${S.role==="buyer"?"on":""}">Buyer</button></div>
+   <div class="pop-wrap"><button class="iconbtn" data-act="bell" aria-label="Notifications">${ic("bell")}${un?`<i>${un}</i>`:""}</button>${bell}</div>
+   <div class="pop-wrap"><button class="avatar" data-act="menu" aria-label="Account menu">${initials(m.name)}</button>${menu}</div>
+  </div></div></header>
+ <main class="page" id="view">${content}</main>
+ <nav class="tabbar" aria-label="Main">${NAV[S.role].map(([k,l,i])=>`<a href="#${k}" class="${key===k||(k==="contracts"&&key==="contract")?"on":""}">${ic(i)}${l}</a>`).join("")}</nav>`}
+
+const adHtml=()=>S.plan==="pro"?"":`<div class="ad"><div class="tag">Demo ad · fictional</div><b>GreenGrow Seeds</b><p class="small" style="margin:4px 0 8px">Certified wheat seed for the next rabi season. Sample offer for this prototype.</p><a href="#plan" class="small" style="color:var(--info)">Remove ads with Pro</a></div>`;
+
+function sortUrgent(a){return[...a].sort((x,y)=>{const f=c=>{const n=next(c);return(status(c)==="completed"?3:(n&&n.who===S.role?0:1))};return f(x)-f(y)||x.deliverBy-y.deliverBy})}
+function ledger(list){
+ if(!list.length)return`<div class="empty"><h3>No contracts match</h3><p>Change the filter or search.</p></div>`;
+ const oc=S.role==="farmer"?"Buyer":"Farmer";
+ return`<div class="tblw"><table class="tbl"><thead><tr><th>Contract</th><th>${oc}</th><th class="r">Value</th><th>Due</th><th>Status</th><th>Next step</th></tr></thead><tbody>${list.map(c=>`
+  <tr class="click" data-act="open" data-id="${c.id}" tabindex="0">
+   <td data-l="Contract"><b>${esc(c.crop)}</b> · ${c.qty} q<div class="mono mute">${c.id}</div></td>
+   <td data-l="${oc}">${esc(other(c).name)}</td>
+   <td class="r num" data-l="Value"><b>${inr(value(c))}</b></td>
+   <td data-l="Due">${dueText(c)}</td><td>${sbadge(c)}</td><td data-l="Next">${nextText(c)}</td></tr>`).join("")}</tbody></table></div>`}
+
+function groupedActivity(list,limit=9){
+ const ev=[];list.forEach(c=>c.log.forEach(l=>ev.push({...l,id:c.id})));ev.sort((a,b)=>b.ts-a.ts);
+ const out=[];let last="";
+ ev.slice(0,limit).forEach(e=>{const n=dd(e.ts),lab=n===0?"Today":n===-1?"Yesterday":fdate(e.ts);if(lab!==last){out.push(`<div class="day">${lab}</div>`);last=lab}
+  out.push(`<div class="act"><i class="${e.who==="sys"?"s":e.who==="B"?"b":""}"></i><div>${esc(e.text)} <span class="mono mute">${e.id}</span></div><time>${new Date(e.ts).toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"})}</time></div>`)});
+ return out.join("")||'<p class="mute small">No activity yet.</p>'}
+
+function ring(score){const r=40,c=2*Math.PI*r,col=score>=85?"var(--ok)":score>=65?"var(--wheat)":"var(--bad)";
+ return`<div class="ring"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="${r}" fill="none" stroke="var(--hair)" stroke-width="9"/><circle cx="48" cy="48" r="${r}" fill="none" stroke="${col}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${(c*score/100).toFixed(1)} ${c.toFixed(1)}"/></svg><b>${score}</b></div>`}
+
+function payoutChart(list){
+ const bk=Array(6).fill(0);
+ list.filter(c=>status(c)!=="completed"&&status(c)!=="disputed").forEach(c=>{
+  const due=c.stage>=5?c.times[5]+c.payTerms*HR:c.deliverBy+c.payTerms*HR,w=clamp(Math.floor(Math.max(0,dd(due))/7),0,5);bk[w]+=Math.max(0,value(c)-c.escrow.released)});
+ const mx=Math.max(...bk,1),W=320,H=150,bw=34,gap=(W-6*bw)/7;
+ const bars=bk.map((v,i)=>{const h=v?Math.max(4,v/mx*84):2,x=gap+i*(bw+gap),y=118-h;
+  return`<g><rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw}" height="${h.toFixed(1)}" rx="3" fill="var(--brand)" fill-opacity="${v?1:.25}"><title>${i===0?"This week":"Week +"+i}: ${inr(v)}</title></rect>
+  ${v?`<text x="${(x+bw/2).toFixed(1)}" y="${(y-5).toFixed(1)}" text-anchor="middle" class="lbl">${v>=1e5?(v/1e5).toFixed(1)+"L":Math.round(v/1000)+"k"}</text>`:""}
+  <text x="${(x+bw/2).toFixed(1)}" y="136" text-anchor="middle">${i===0?"Now":"+"+i+"w"}</text></g>`}).join("");
+ return`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Expected payments by week"><line x1="0" x2="${W}" y1="118" y2="118" stroke="var(--hair)"/>${bars}</svg>`}
+
+function healthCard(){
+ const m=me(),t=trustOf(m),L=mine(),act=L.filter(c=>{const n=next(c);return n&&n.who===S.role&&status(c)!=="completed"}),dis=L.filter(c=>status(c)==="disputed");
+ const first=sortUrgent(L).find(c=>{const n=next(c);return n&&n.who===S.role});
+ const tone=t.score>=90?"Strong":t.score>=75?"Good":"Fair";
+ const sum=`${tone} standing: ${t.completed} contracts completed, ${t.onTime}% on time.${act.length?` ${act.length} contract${act.length>1?"s are":" is"} waiting on you.`:" Nothing is waiting on you."}${dis.length?` ${dis.length} open dispute${dis.length>1?"s":""} can pull the score down if it goes against you.`:""}`;
+ const hp=dis.length&&dis[0]?`Follow the dispute on ${dis[0].id}`:first?`${next(first).label}: ${first.id} (${first.crop}, ${first.qty} q)`:"";
+ return`<div class="card"><div class="row" style="gap:14px">${ring(t.score)}<div class="sp"><h2 style="margin:0">${S.role==="farmer"?"Your trust score":"Your reliability"}</h2><div class="small mute">out of 100 · <a href="#trust">See breakdown</a></div></div></div>
+ <div class="row" style="margin:14px 0 6px"><b class="small">Summary</b><span class="demo">Demo AI</span></div><p class="small" style="color:var(--ink2);margin:0 0 8px">${sum}</p>${hp?`<p class="small" style="margin:0"><b>Highest priority:</b> ${esc(hp)}</p>`:""}</div>`}
+
+function dashboard(){
+ const L=mine(),open=L.filter(c=>status(c)!=="completed"),todo=L.filter(c=>{const n=next(c);return n&&n.who===S.role&&status(c)!=="completed"}),
+  held=sum(L.map(c=>c.escrow.held)),paid=sum(L.map(c=>c.escrow.released)),f=S.ui.dfilter||"all";
+ let rows=sortUrgent(L);if(f!=="all")rows=rows.filter(c=>status(c)===f);rows=rows.slice(0,7);
+ const g=new Date().getHours(),greet=g<12?"Good morning":g<17?"Good afternoon":"Good evening";
+ const farmer=S.role==="farmer";
+ return`<div class="eyebrow">${farmer?"Your contracts, one screen":"Your supply book, one screen"}</div>
+ <div class="sec-h"><div><h1>Dashboard</h1><p class="page-sub">${greet}, ${esc(me().name.split(" ")[0])}. ${todo.length?`${todo.length} thing${todo.length>1?"s need":" needs"} you.`:"You are all caught up."}</p></div>
+  <div class="row"><button class="btn sec" data-act="export">${ic("file")}Export CSV</button><button class="btn" data-act="newc">${ic("plus")}New contract</button></div></div>
+ <div class="stats">
+  <div class="stat"><span>Open contracts</span><b>${open.length}</b></div>
+  <div class="stat ${todo.length?"warn":"ok"}"><span>Needs your action</span><b>${todo.length}</b></div>
+  <div class="stat"><span>${farmer?"Secured in escrow":"Escrow you funded"}</span><b>${inr(held)}</b></div>
+  <div class="stat ok"><span>${farmer?"Received so far":"Paid out so far"}</span><b>${inr(paid)}</b></div></div>
+ <div class="layout"><div class="col">
+  <div class="card"><div class="sec-h" style="margin-bottom:8px"><h2 style="margin:0">Most urgent contracts</h2>
+   <select id="dfilter" data-bind="dfilter" style="width:auto;margin:0;padding:7px 10px;font-size:13px"><option value="all">All statuses</option>${Object.entries(STAT).map(([k,v])=>`<option value="${k}" ${f===k?"selected":""}>${v[0]}</option>`).join("")}</select></div>
+   ${ledger(rows)}<div style="margin-top:10px"><a href="#contracts" class="btn ghost sm">View all contracts ${ic("arrow")}</a></div></div>
+  <div class="card"><h2>Recent activity</h2>${groupedActivity(L)}</div></div>
+  <aside class="rail">${healthCard()}
+   <div class="card"><h2>${farmer?"Money you are owed, by week":"Money due out, by week"}</h2>${payoutChart(L)}<p class="tiny mute" style="margin:6px 0 0">Based on delivery dates and payment terms. Disputed contracts are excluded.</p></div>
+   ${adHtml()}</aside></div>`}
+
+function contractsView(){
+ const q=(S.ui.csearch||"").toLowerCase(),f=S.ui.cfilter||"all";
+ const L=sortUrgent(mine());
+ return`<div class="eyebrow">All agreements</div>
+ <div class="sec-h"><div><h1>Contracts</h1><p class="page-sub">Every price, delivery and payment term, locked and timestamped.</p></div>
+ <div class="row"><button class="btn sec" data-act="export">${ic("file")}Export CSV</button><button class="btn" data-act="newc">${ic("plus")}New contract</button></div></div>
+ <div class="card"><div class="row" style="margin-bottom:12px"><div class="chips">${[["all","All"],...Object.entries(STAT).map(([k,v])=>[k,v[0]])].map(([k,l])=>`<button class="chip ${f===k?"on":""}" data-act="cfilter" data-v="${k}">${l}</button>`).join("")}</div>
+ <div class="sp"></div><input type="search" id="csearch" placeholder="Search crop, buyer or ID" value="${esc(S.ui.csearch||"")}" style="max-width:260px;margin:0" aria-label="Search contracts"></div>
+ <div id="ledgerWrap">${ledger(filterList(L))}</div></div>`}
+function filterList(L){const q=(S.ui.csearch||"").toLowerCase(),f=S.ui.cfilter||"all";
+ return L.filter(c=>(f==="all"||status(c)===f)&&(!q||(c.crop+" "+c.id+" "+other(c).name).toLowerCase().includes(q)))}
+
+function detail(id){
+ const c=byId(id);if(!c||!mine().includes(c))return null;
+ const o=other(c),n=next(c),st=status(c),t=trustOf(o),farmer=S.role==="farmer",locked=!!c.lockedHash;
+ const D={sign:"Your signature locks your side of the terms. When both sides sign, the terms are fingerprinted and nobody can edit them.",
+  fund:farmer?`${person(c.buyerId).name} needs to put ${inr(value(c))} into escrow. Do not load the truck before this is done.`:`Put ${inr(value(c))} into escrow. It is released to the farmer only as the contract progresses.`,
+  dispatch:farmer?`Escrow is funded. Dispatch now and ${c.advancePct}% (${inr(value(c)*c.advancePct/100)}) is released to you as an advance.`:`Waiting for ${person(c.farmerId).name} to dispatch.`,
+  transit:"The vehicle is on its way. Location updates come from the logistics partner.",
+  receive:farmer?`${person(c.buyerId).name} will weigh the goods at the gate and record moisture. Final payment uses the weighed quantity.`:"Weigh the goods at your gate and record the moisture reading.",
+  confirm:farmer?`Delivered and weighed. If the buyer does not respond, ${inr(c.final-c.escrow.released)} releases automatically on ${fdate(c.times[5]+c.payTerms*HR)}.`:`Check quality against the agreed spec, then release ${inr(c.final-c.escrow.released)}. If you do nothing, it auto-releases on ${fdate(c.times[5]+c.payTerms*HR)}.`,
+  dispute:"Escrow is frozen while the case is reviewed. See the dispute panel."};
+ let nextCard="";
+ if(st==="completed")nextCard=`<div class="card next"><h2>${ic("check")} Contract complete</h2><p class="small" style="margin:0">${c.dispute&&c.dispute.outcome?"Closed through dispute resolution.":`${inr(c.escrow.released)} paid to the farmer${c.rated?`. Rated ${"★".repeat(c.rated)}`:""}.`}</p></div>`;
+ else if(n){const mineTurn=n.who===S.role;
+  nextCard=`<div class="card next"><div class="eyebrow">${mineTurn?"Your turn":n.who==="system"?"In progress":"Waiting"}</div><h2>${mineTurn?n.label:n.who==="system"?n.label:`Waiting on ${esc(o.name)}`}</h2><p class="small" style="color:var(--ink2)">${D[n.key]||""}</p>
+  <div class="row">${mineTurn&&n.key!=="dispute"?`<button class="btn" data-act="do" data-key="${n.key}" data-id="${c.id}">${n.label}</button>`:""}${c.stage>=2&&st!=="disputed"?`<button class="btn danger" data-act="report" data-id="${c.id}">${ic("alert")}Report an issue</button>`:""}</div></div>`}
+ const tl=STAGES.map((s,i)=>{const done=c.stage>=i+1,cur=c.stage===i&&st!=="disputed"||(st==="disputed"&&c.stage===i);
+  let sub=done?ftime(c.times[i+1]):"Pending";
+  if(i===2&&c.vehicle&&done)sub+=` · ${esc(c.vehicle.no)}, ${esc(c.vehicle.driver)}`;
+  if(i===4&&c.delivery&&done)sub+=` · ${c.delivery.weighed} q, moisture ${c.delivery.moisture}%`;
+  return`<li class="${done?"done":cur?"cur":""}"><div class="dot">${done?ic("check"):""}</div><div><div class="t">${s}</div><div class="small mute">${sub}</div></div></li>`}).join("");
+ const spec=`${c.crop}, grade ${c.grade}`;
+ const termsCard=`<div class="card"><div class="row" style="margin-bottom:8px"><h2 style="margin:0">Terms</h2><span class="badge ${locked?"":"warn"}">${locked?ic("lock")+" Locked":"Draft"}</span></div>
+  <div class="kv"><span>Crop</span><span>${esc(spec)}</span></div><div class="kv"><span>Quantity</span><span>${c.qty} quintal</span></div>
+  <div class="kv"><span>Price</span><span>${inr(c.price)} / quintal</span></div>
+  <div class="kv"><span>${c.final!=null&&c.final!==c.qty*c.price?"Final value (weighed)":"Total value"}</span><span><b>${inr(value(c))}</b></span></div>
+  <div class="kv"><span>Deliver by</span><span>${fdate(c.deliverBy)}</span></div><div class="kv"><span>Route</span><span>${esc(c.place)}</span></div>
+  <div class="kv"><span>Advance on dispatch</span><span>${c.advancePct}%</span></div><div class="kv"><span>Payment after delivery</span><span>within ${c.payTerms} hours</span></div>
+  <div class="kv"><span>Quality spec</span><span>${esc(c.quality)}</span></div>
+  ${locked?`<div class="callout lock" style="margin-top:12px">${ic("lock")}<div>Terms locked and timestamped on ${ftime(c.lockedAt)}. Neither side can edit them.<div class="hash mono">SHA-256 · ${c.lockedHash}</div>
+   <div class="row"><button class="btn sec sm" data-act="verify" data-id="${c.id}">Verify integrity</button><button class="btn ghost sm" data-act="tamper" data-id="${c.id}">Try tampering</button></div></div></div><div id="integ"></div>`:`<div class="callout warn" style="margin-top:12px">${ic("info")}<div>This is a draft. Terms lock and get a tamper-proof fingerprint once both sides sign.</div></div>`}
+  <div class="row" style="margin-top:12px"><button class="btn sec sm" data-act="speak" data-lang="en" data-id="${c.id}">${ic("sound")}Read aloud</button><button class="btn sec sm" data-act="speak" data-lang="hi" data-id="${c.id}">${ic("sound")}हिंदी में सुनें</button>
+   <a class="btn sec sm" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(buildSummary(c,"en"))}">Share on WhatsApp</a></div></div>`;
+ const txs=c.tx.length?c.tx.map(x=>`<div class="kv"><span>${esc(x.label)}<div class="tiny">${ftime(x.ts)}</div></span><span class="num" style="color:${x.dir==="in"?"var(--info)":x.dir==="out"?"var(--ok)":"var(--muted)"}">${x.dir==="in"?"+":x.dir==="out"?"→":"↩"} ${inr(x.amt)}</span></div>`).join(""):'<p class="small mute" style="margin:6px 0 0">No money has moved yet.</p>';
+ const payCard=`<div class="card"><h2>Payment</h2>
+  <div class="kv"><span>Contract value</span><span><b>${inr(value(c))}</b></span></div><div class="kv"><span>Held in escrow</span><span>${inr(c.escrow.held)}</span></div>
+  <div class="kv"><span>Paid to farmer</span><span>${inr(c.escrow.released)}</span></div>${c.escrow.refunded?`<div class="kv"><span>Returned to buyer</span><span>${inr(c.escrow.refunded)}</span></div>`:""}
+  <h3 style="margin-top:14px">Money trail</h3>${txs}<p class="tiny mute" style="margin:10px 0 0">Prototype: payments are simulated. No real money moves.</p></div>`;
+ const d=c.dispute;
+ const dispCard=d?`<div class="card"><div class="row" style="margin-bottom:8px"><h2 style="margin:0">Dispute</h2><span class="badge ${d.outcome?"ok":"bad"}">${d.outcome?"Resolved":"Open"}</span></div>
+  <p class="small" style="margin:0 0 6px"><b>${esc(d.reason)}</b><br>Raised by ${d.by==="buyer"?person(c.buyerId).name:person(c.farmerId).name} on ${fdate(d.opened)}</p>${d.note?`<p class="small mute">"${esc(d.note)}"</p>`:""}
+  <ul class="steps">${["Issue raised","Evidence review","Mediation","Resolved"].map((s,i)=>{const dn=d.outcome?true:d.stage>=i;return`<li class="${dn?"done":""}"><div class="dot">${dn?ic("check"):""}</div><div class="t">${s}</div></li>`}).join("")}</ul>
+  <div class="small mute">Evidence attached</div><div class="srcs">${d.evidence.map(e=>`<span class="badge gray">${esc(e)}</span>`).join("")}</div>
+  ${d.outcome?`<div class="callout ok" style="margin-top:12px">${ic("check")}<div>${d.outcome.type==="release"?"Full payment released to the farmer.":d.outcome.type==="partial"?"Settled with a 10% price adjustment.":"Remaining escrow refunded to the buyer."}</div></div>`:""}</div>`:"";
+ const demo=[];
+ if(!d||d.outcome){ if(n&&n.who!==S.role&&n.who!=="system"&&st!=="completed")demo.push(`<button class="btn sec sm wide" data-act="sim" data-id="${c.id}" data-key="${n.key}" data-as="${n.who}">Demo: ${esc(o.name.split(" ")[0])} ${n.label.toLowerCase()}</button>`);
+  if(n&&n.who==="system"&&n.key==="transit")demo.push(`<button class="btn sec sm wide" data-act="sim" data-id="${c.id}" data-key="transit" data-as="system">Demo: simulate GPS update</button>`);
+  if(c.stage===5&&!d)demo.push(`<button class="btn sec sm wide" data-act="sim" data-id="${c.id}" data-key="confirm" data-as="system">Demo: fast-forward ${c.payTerms}h (auto-release)</button>`)}
+ if(d&&!d.outcome){if(d.stage<2)demo.push(`<button class="btn sec sm wide" data-act="sim" data-id="${c.id}" data-key="dstep" data-as="system">Demo: advance dispute to ${d.stage===0?"evidence review":"mediation"}</button>`);
+  else demo.push(`<button class="btn sec sm wide" data-act="sim" data-id="${c.id}" data-key="resolve" data-as="system" data-type="release">Resolve: pay the farmer in full</button><button class="btn sec sm wide" data-act="sim" data-id="${c.id}" data-key="resolve" data-as="system" data-type="partial">Resolve: settle at -10%</button><button class="btn sec sm wide" data-act="sim" data-id="${c.id}" data-key="resolve" data-as="system" data-type="refund">Resolve: refund the buyer</button>`)}
+ const demoCard=demo.length?`<div class="demo-box"><h3>Demo controls <span class="demo">Prototype</span></h3><p class="small mute">Act for the other side to walk through the full flow alone.</p><div class="col" style="gap:8px">${demo.join("")}</div></div>`:"";
+ const pc=priceCheck(c.crop,c.price,c.payTerms,c.advancePct,null);
+ const cpCard=`<div class="card"><div class="row"><h2 style="margin:0">${o.type==="buyer"?"Buyer":"Farmer"}</h2><span class="badge ok">${ic("check")} eKYC verified</span></div>
+  <div style="margin:10px 0 4px"><b>${esc(o.name)}</b><div class="small mute">${esc(o.place)} · member since ${o.since}</div></div>
+  <div class="meter"><div class="row"><span>${o.type==="buyer"?"Reliability":"Trust"} score</span><b>${t.score}/100</b></div><div class="bar"><i style="width:${t.score}%"></i></div></div>
+  <div class="kv"><span>Completed contracts</span><span>${t.completed}</span></div><div class="kv"><span>On-time record</span><span>${t.onTime}%</span></div></div>`;
+ const sigCard=`<div class="card"><h2>Signatures</h2><div class="kv"><span>Farmer (${esc(person(c.farmerId).name.split(" ")[0])})</span><span>${c.sig.f?ic("check")+" "+ftime(c.sig.f):"Pending"}</span></div><div class="kv"><span>Buyer (${esc(person(c.buyerId).name.split(" ")[0])})</span><span>${c.sig.b?ic("check")+" "+ftime(c.sig.b):"Pending"}</span></div></div>`;
+ const pcCard=`<div class="card"><div class="row"><h2 style="margin:0">Price check</h2><span class="demo">Rule-based</span></div><ul class="fair">${pc.map(x=>`<li>${ic(x.t==="ok"?"check":x.t==="warn"?"alert":"info")}<span style="color:var(--${x.t==="ok"?"ok":x.t==="warn"?"warn":"info"})">${esc(x.x)}</span></li>`).join("")}</ul></div>`;
+ return`<a href="#contracts" class="small" style="text-decoration:none;color:var(--muted)">← All contracts</a>
+ <div class="sec-h" style="margin-top:8px"><div><div class="eyebrow mono" style="text-transform:none;letter-spacing:0">${c.id}</div><h1>${esc(c.crop)} · ${c.qty} quintal</h1><p class="page-sub">${farmer?"Sold to":"Bought from"} ${esc(o.name)} · ${inr(value(c))}</p></div>${sbadge(c)}</div>
+ <div class="layout"><div class="col">${nextCard}<div class="card"><h2>Progress</h2><ul class="steps">${tl}</ul></div>${termsCard}${payCard}<div class="card"><h2>Activity</h2>${groupedActivity([c],20)}</div></div>
+ <aside class="rail">${cpCard}${sigCard}${pcCard}${dispCard}${demoCard}</aside></div>`}
+
+function marketView(){
+ const crop=S.ui.mcrop&&CROPS[S.ui.mcrop]?S.ui.mcrop:"Wheat",C=CROPS[crop],s=mseries(crop),ch=(s[29]-s[0])/s[0]*100,
+  cp=(mine().find(c=>c.crop===crop&&status(c)!=="completed")||{}).price,hi=Math.max(...s),lo=Math.min(...s);
+ const note=`${crop} has been ${Math.abs(ch)<1?"flat":ch>0?"rising":"easing"} over 30 days (${ch>=0?"+":""}${ch.toFixed(1)}%), trading between ${inr(lo)} and ${inr(hi)}.${cp?` Your open contract at ${inr(cp)} is ${Math.abs((cp-s[29])/s[29]*100).toFixed(1)}% ${cp>=s[29]?"above":"below"} today's mandi rate.`:""}${C.msp?` The MSP reference is ${inr(C.msp)}.`:""}`;
+ return`<div class="eyebrow">Price intelligence</div><div class="sec-h"><div><h1>Market</h1><p class="page-sub">Check a fair price before you sign.</p></div></div>
+ <div class="chips" style="margin-bottom:16px">${Object.keys(CROPS).map(k=>`<button class="chip ${k===crop?"on":""}" data-act="mcrop" data-v="${esc(k)}">${k}</button>`).join("")}</div>
+ <div class="stats"><div class="stat"><span>Mandi price today</span><b>${inr(s[29])}</b></div><div class="stat ${ch>=0?"ok":"warn"}"><span>30-day change</span><b>${ch>=0?"+":""}${ch.toFixed(1)}%</b></div>
+  <div class="stat"><span>MSP ${C.msp?"("+C.season+")":""}</span><b>${C.msp?inr(C.msp):"None"}</b></div><div class="stat"><span>Above MSP</span><b>${C.msp?inr(s[29]-C.msp):"n/a"}</b></div></div>
+ <div class="layout"><div class="col"><div class="card"><div class="row" style="margin-bottom:10px"><h2 style="margin:0">${crop}: price per quintal, last 30 days</h2><span class="demo">Demo data</span></div><div class="cw" id="mcw">${marketChart(crop,cp)}<div class="tip hide" id="mtip"></div></div>
+  <p class="tiny mute" style="margin:8px 0 0">Illustrative modal mandi prices, not a live feed. MSP figures are reference values from PIB announcements; confirm the latest before you rely on them.</p></div>
+  <div class="card"><h2>Nearby mandis</h2><div class="tblw"><table class="tbl"><thead><tr><th>Mandi</th><th class="r">Price / q</th><th class="r">vs Panipat</th></tr></thead><tbody>${MANDIS.map(([n,o])=>`<tr><td data-l="Mandi">${n}</td><td class="r num" data-l="Price">${inr(Math.round(C.base*(1+o)/5)*5)}</td><td class="r num" data-l="vs Panipat" style="color:${o>=0?"var(--ok)":"var(--warn)"}">${o>=0?"+":""}${(o*100).toFixed(1)}%</td></tr>`).join("")}</tbody></table></div></div></div>
+ <aside class="rail"><div class="card"><div class="row"><h2 style="margin:0">Market note</h2><span class="demo">Demo AI</span></div><p class="small" style="color:var(--ink2);margin:10px 0 0">${note}</p></div>
+ <div class="card"><h2>Ready to sell?</h2><p class="small mute">Start a contract at a price you have checked.</p><button class="btn wide" data-act="newc" data-crop="${esc(crop)}">${ic("plus")}New ${esc(crop)} contract</button></div>${adHtml()}</aside></div>`}
+
+function marketChart(crop,cp){
+ const C=CROPS[crop],s=mseries(crop),W=640,H=280,ml=50,mr=14,mt=16,mb=28,vals=[...s];if(C.msp)vals.push(C.msp);if(cp)vals.push(cp);
+ let lo=Math.min(...vals),hi=Math.max(...vals);const pad=(hi-lo)*.14||10;lo-=pad;hi+=pad;
+ const raw=(hi-lo)/4,mag=Math.pow(10,Math.floor(Math.log10(raw))),step=[1,2,2.5,5,10].map(m=>m*mag).find(x=>x>=raw);
+ lo=Math.floor(lo/step)*step;hi=Math.ceil(hi/step)*step;
+ const X=i=>ml+i*(W-ml-mr)/29,Y=v=>mt+(hi-v)/(hi-lo)*(H-mt-mb);
+ let grid="";for(let v=lo;v<=hi+1e-6;v+=step)grid+=`<line x1="${ml}" x2="${W-mr}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="var(--hair)" stroke-width="1"/><text x="${ml-8}" y="${(Y(v)+4).toFixed(1)}" text-anchor="end">${Math.round(v).toLocaleString("en-IN")}</text>`;
+ const xl=[0,7,14,21,29].map(i=>`<text x="${X(i).toFixed(1)}" y="${H-8}" text-anchor="${i===0?"start":i===29?"end":"middle"}">${fshort(Date.now()-(29-i)*DAY)}</text>`).join("");
+ const line=s.map((v,i)=>`${i?"L":"M"}${X(i).toFixed(1)} ${Y(v).toFixed(1)}`).join(""),area=`${line}L${X(29).toFixed(1)} ${Y(lo)}L${X(0).toFixed(1)} ${Y(lo)}Z`;
+ const msp=C.msp?`<line x1="${ml}" x2="${W-mr}" y1="${Y(C.msp)}" y2="${Y(C.msp)}" stroke="var(--wheat)" stroke-width="1.5" stroke-dasharray="5 4"/><text class="lbl" x="${ml+6}" y="${Y(C.msp)-6}">MSP ${inr(C.msp)}</text>`:"";
+ const cl=cp?`<line x1="${ml}" x2="${W-mr}" y1="${Y(cp)}" y2="${Y(cp)}" stroke="var(--info)" stroke-width="1.5" stroke-dasharray="2 3"/><text class="lbl" x="${W-mr-4}" y="${Y(cp)+(cp>=s[29]?-6:15)}" text-anchor="end">Your contract ${inr(cp)}</text>`:"";
+ return`<svg class="chart" id="mchart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${crop} price over the last 30 days">${grid}${xl}<path d="${area}" fill="var(--brand)" fill-opacity=".10"/>${msp}${cl}<path d="${line}" fill="none" stroke="var(--brand)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+  <line id="mcx" x1="0" x2="0" y1="${mt}" y2="${H-mb}" stroke="var(--muted)" stroke-width="1" class="hide"/><circle id="mcd" r="4.5" fill="var(--brand)" stroke="var(--surface)" stroke-width="2" cx="${X(29).toFixed(1)}" cy="${Y(s[29]).toFixed(1)}"/>
+  <text class="lbl" x="${X(29)-8}" y="${Y(s[29])+20}" text-anchor="end">${inr(s[29])} today</text></svg>`}
+function bindMarket(){
+ const w=$("#mcw");if(!w)return;const crop=S.ui.mcrop&&CROPS[S.ui.mcrop]?S.ui.mcrop:"Wheat",s=mseries(crop),svg=$("#mchart"),tip=$("#mtip"),vx=$("#mcx"),dot=$("#mcd");
+ const W=640,H=280,ml=50,mr=14,mt=16,mb=28,vals=[...s];const C=CROPS[crop];if(C.msp)vals.push(C.msp);const cpv=(mine().find(c=>c.crop===crop&&status(c)!=="completed")||{}).price;if(cpv)vals.push(cpv);
+ let lo=Math.min(...vals),hi=Math.max(...vals);const pad=(hi-lo)*.14||10;lo-=pad;hi+=pad;const raw=(hi-lo)/4,mag=Math.pow(10,Math.floor(Math.log10(raw))),step=[1,2,2.5,5,10].map(m=>m*mag).find(x=>x>=raw);lo=Math.floor(lo/step)*step;hi=Math.ceil(hi/step)*step;
+ const move=e=>{const r=svg.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*W,i=clamp(Math.round((x-ml)/((W-ml-mr)/29)),0,29),px=ml+i*(W-ml-mr)/29,py=mt+(hi-s[i])/(hi-lo)*(H-mt-mb);
+  vx.classList.remove("hide");vx.setAttribute("x1",px);vx.setAttribute("x2",px);dot.setAttribute("cx",px);dot.setAttribute("cy",py);
+  tip.classList.remove("hide");tip.style.left=(px/W*r.width)+"px";tip.style.top=(py/H*r.height)+"px";tip.innerHTML=`<b>${inr(s[i])}</b> · ${fshort(Date.now()-(29-i)*DAY)}`};
+ svg.addEventListener("pointermove",move);svg.addEventListener("pointerleave",()=>{vx.classList.add("hide");tip.classList.add("hide")})}
+
+function schemesView(){
+ const p={land:S.land,state:S.state},res=SCHEMES.map(s=>({s,m:s.rule(p)})).filter(x=>x.m>0).sort((a,b)=>a.m-b.m);
+ const disc=S.ui.disc;
+ return`<div class="eyebrow">Support you may be missing</div><div class="sec-h"><div><h1>Schemes and subsidies</h1><p class="page-sub">Matched to your land and crops. Always confirm on the official site.</p></div></div>
+ <div class="layout"><div class="col"><div class="card"><div class="row" style="margin-bottom:6px"><h2 style="margin:0">Potential matches</h2><span class="badge gray">${res.length} found</span></div>
+  ${res.map(({s,m})=>`<div class="scheme"><div class="row"><h3>${s.name}</h3><span class="badge">${s.cat}</span>${m===2?'<span class="badge warn">More info needed</span>':""}</div><p class="small" style="color:var(--ink2);margin:4px 0">${s.desc}</p><p class="small" style="margin:0"><b>Potential benefit:</b> ${s.benefit}</p>
+  <div class="src">Source: <a href="${s.url}" target="_blank" rel="noopener">${s.src}</a> · curated demo record</div></div>`).join("")||'<p class="mute">No matches for this profile.</p>'}
+  <div style="margin-top:14px"><button class="btn sec" data-act="discover" ${disc==="loading"?"disabled":""}>${disc==="loading"?'<span class="spin"></span> Searching…':"Search for more current schemes"}</button></div>
+  ${disc&&disc!=="loading"?`<div class="ai-card"><div class="row"><b>Discovered via web search</b><span class="demo">Demo mode</span></div><p style="margin:8px 0">This prototype has no live search. In the full product, newly announced schemes found on official portals would appear here, kept separate from the verified records above.</p><div class="srcs">${disc.map(x=>`<a href="${x.u}" target="_blank" rel="noopener">${x.t}</a>`).join("")}</div></div>`:""}
+  <p class="tiny mute" style="margin:14px 0 0">AgriBond does not guarantee eligibility. Benefit amounts and rules change, so confirm with the official scheme source before applying.</p></div></div>
+ <aside class="rail"><div class="card"><h2>Your farm profile</h2><label class="f">Land holding (acres)<input type="number" min="0" step="0.5" id="land" data-bind="land" value="${S.land}"></label>
+  <label class="f">State<select id="state" data-bind="state">${["Haryana","Punjab","Uttar Pradesh","Rajasthan","Madhya Pradesh","Maharashtra"].map(x=>`<option ${S.state===x?"selected":""}>${x}</option>`).join("")}</select></label>
+  <p class="small mute" style="margin:0">Change these and the matches update.</p></div>${adHtml()}</aside></div>`}
+
+function trustView(){
+ const m=me(),t=trustOf(m),farmer=S.role==="farmer",P=t.parts;
+ const rows=[["Identity verified (eKYC)",P.kyc,12],["Completed contracts ("+t.completed+")",P.record,24],["On-time record ("+t.onTime+"%)",P.punct,28],["Starting score",P.base,38]];
+ const closed=mine().filter(c=>status(c)==="completed");
+ return`<div class="eyebrow">Your reputation</div><div class="sec-h"><div><h1>${farmer?"Trust score":"Reliability score"}</h1><p class="page-sub">${farmer?"Buyers see this before they sign with you.":"Farmers see this before they sign with you."}</p></div></div>
+ <div class="layout"><div class="col"><div class="card"><div class="row" style="gap:20px;margin-bottom:8px">${ring(t.score)}<div class="sp"><h2 style="margin:0">${esc(m.name)}</h2><div class="small mute">${esc(m.place)} · member since ${m.since}</div><div class="row" style="margin-top:8px"><span class="badge ok">${ic("check")} eKYC verified</span><span class="badge">${t.completed} completed</span></div></div></div>
+  <h3 style="margin-top:14px">How the score is built</h3>${rows.map(([l,v,mx])=>`<div class="meter"><div class="row"><span>${l}</span><b>${v}/${mx}</b></div><div class="bar"><i style="width:${v/mx*100}%"></i></div></div>`).join("")}
+  ${P.pen?`<div class="meter"><div class="row"><span>Disputes lost (${t.lost})</span><b style="color:var(--bad)">-${P.pen}</b></div><div class="bar"><i class="w" style="width:${clamp(P.pen*4,4,100)}%;background:var(--bad)"></i></div></div>`:""}</div>
+  <div class="card"><h2>Closed contracts</h2>${closed.length?ledger(closed):'<p class="mute small">Completed contracts and their ratings will appear here.</p>'}</div></div>
+ <aside class="rail"><div class="card"><h2>Verification</h2>
+  ${[["Mobile number (OTP)",1],["Aadhaar eKYC (simulated)",1],["Bank account (simulated)",1],[farmer?"Land record (simulated)":"GST "+(m.gst||""),1]].map(([l])=>`<div class="kv"><span>${esc(l)}</span><span class="badge ok">${ic("check")} Verified</span></div>`).join("")}</div>
+ <div class="card"><h2>What moves your score</h2><ul style="padding-left:18px;margin:0;font-size:14px;color:var(--ink2)"><li>Complete contracts on time</li><li>${farmer?"Deliver the agreed quantity and grade":"Fund escrow and confirm quickly"}</li><li>Avoid disputes that go against you</li></ul></div></aside></div>`}
+
+function planView(){
+ const open=mine().filter(c=>status(c)!=="completed").length,pro=S.plan==="pro";
+ const feat=a=>a.map(x=>`<li>${ic("check")}${x}</li>`).join("");
+ return`<div class="eyebrow">Your plan</div><div class="sec-h"><div><h1>Plan and billing <span class="badge ${pro?"warn":""}" style="vertical-align:middle;margin-left:6px">${pro?"Pro":"Free"}</span></h1><p class="page-sub">Demo upgrade flow. No payment is collected and the change applies immediately.</p></div></div>
+ <div class="card" style="margin-bottom:16px"><div class="meter" style="margin-top:0"><div class="row"><span>Open contracts</span><b>${open} of ${pro?"unlimited":5}</b></div><div class="bar"><i style="width:${pro?10:clamp(open/5*100,0,100)}%"></i></div></div>
+ <div class="meter" style="margin-bottom:0"><div class="row"><span>AI agreement scans used</span><b>${S.aiUsed}${pro?" (unlimited)":" of 3"}</b></div><div class="bar"><i class="w" style="width:${pro?10:clamp(S.aiUsed/3*100,0,100)}%"></i></div></div></div>
+ <div class="plans"><div class="plan ${pro?"":"cur"}"><h3>Free</h3><div class="price">₹0</div><ul>${feat(["Up to 5 open contracts","3 AI agreement scans","Escrow, delivery tracking and disputes","Trust score and market prices","Demo ads shown"])}</ul><button class="btn sec wide" data-act="setplan" data-v="free" ${pro?"":"disabled"}>${pro?"Switch to Free":"Current plan"}</button></div>
+ <div class="plan ${pro?"cur":""}"><h3>Pro</h3><div class="price">₹199<span class="small mute" style="font-weight:400"> / month</span></div><ul>${feat(["Unlimited open contracts","Unlimited AI agreement scans","CSV export of your ledger","SMS payment alerts","No ads"])}</ul><button class="btn wide" data-act="setplan" data-v="pro" ${pro?"disabled":""}>${pro?"Current plan":"Upgrade to Pro (demo)"}</button></div></div>`}
+
+/* ============ landing + login ============ */
+function landing(){
+ const rows=[["Wheat · 20 q","Shree Agro Mills","Awaiting signature","warn",35,"Deliver in 12d"],["Mustard · 12 q","Kisan Oilseeds","In transit","",70,"Arrives in 4d"],["Basmati · 35 q","Haryana Rice Exports","Verify delivery","warn",92,"Pay by tomorrow"],["Maize · 18 q","Shree Agro Mills","Paid in full","",100,"Completed"]];
+ return`<div class="lp"><section class="hero"><div class="lp-in"><div class="lp-top"><a class="brand" href="#welcome">${logo()}AgriBond</a><div class="row"><a class="btn o sm" href="#login">Sign in</a></div></div>
+ <div class="hero-g"><div><h1>Sell your crop on a contract that pays on time.</h1><p class="lede">Lock the price, see the money in escrow before you load the truck, and get paid when the buyer confirms. One record for farmers and the mills that buy from them.</p>
+  <div class="row" style="gap:12px"><a class="btn l" data-act="start" data-v="farmer" href="#login">Start as a farmer</a><a class="btn o" data-act="start" data-v="buyer" href="#login">I'm a buyer</a></div>
+  <p class="fine">Prototype with simulated payments, KYC and AI. <a href="#login" data-act="enter" data-v="farmer" style="color:var(--hero-ink)">Explore the demo account</a></p></div>
+ <div class="board" aria-label="Example contract board"><div class="board-h"><strong>My contracts</strong><span>4 this season</span></div>${rows.map(r=>`<div class="brow"><div class="t"><span>${r[0]}</span><span class="badge ${r[3]}">${r[2]}</span></div><div class="s"><span>${r[1]}</span><span>${r[5]}</span></div><div class="run ${r[3]}"><i style="width:${r[4]}%"></i></div></div>`).join("")}</div></div></div></section>
+ <div class="lp-in"><section class="lp-sec"><h2>Everything that goes wrong between a handshake and a payment</h2><div class="bento">
+  <article class="tile w t"><h3>Locked contracts</h3><p>Both sides sign with an OTP. The terms get a SHA-256 fingerprint, so any later change is visible.</p><span class="badge">${ic("lock")} Tamper-evident</span></article>
+  <article class="tile w"><h3>Escrow before dispatch</h3><p>The buyer funds the full amount first. You get an advance when you dispatch and the balance on confirmation.</p><span class="badge ok">${ic("rupee")} Payment secured</span></article>
+  <article class="tile"><h3>Delivery and weighbridge</h3><p>Dispatch, transit and gate weight are logged. Payment follows the weighed quantity.</p></article>
+  <article class="tile"><h3>Trust score</h3><p>On-time delivery and payment build a record that both sides can see before they sign.</p></article>
+  <article class="tile"><h3>Fair price check</h3><p>Compare your price with the MSP and the mandi rate while you draft.</p></article>
+  <article class="tile w d"><h3>Schemes matched to your farm</h3><p>PM-KISAN, crop insurance, credit and storage support, each with its official source.</p></article>
+  <article class="tile w"><h3>Ask AgriBond</h3><p>Ask about your payments, a contract, MSP or a scheme and get an answer from your own records.</p><span class="badge">${ic("chat")} Demo AI</span></article></div></section>
+ <section class="lp-sec"><h2>From handshake to payment in four steps</h2><div class="how"><div><b>Agree</b><p>Draft the contract. AI can read a photo of a handwritten note.</p></div><div><b>Lock</b><p>Both sign. Terms are fingerprinted.</p></div><div><b>Deliver</b><p>Escrow is funded, then the truck moves and is weighed.</p></div><div><b>Get paid</b><p>The buyer confirms, or it auto-releases in 48 hours.</p></div></div></section>
+ <section class="lp-cta"><h2>See the whole flow in two minutes</h2><div class="row" style="justify-content:center"><a class="btn" href="#login" data-act="enter" data-v="farmer">Open the demo as a farmer</a><a class="btn sec" href="#login" data-act="enter" data-v="buyer">Open the demo as a buyer</a></div></section>
+ <footer class="lp-foot"><span>AgriBond prototype · payments, KYC and AI are simulated</span><span>Reference prices are illustrative</span></footer></div></div>`}
+
+function loginView(){
+ const u=S.ui.login=S.ui.login||{role:"farmer",sent:false};
+ return`<div class="lp-in" style="padding:0"><div class="lp-top"><a class="brand" href="#welcome">${logo()}AgriBond</a></div><div class="auth"><div class="card">
+ <h1 style="font-size:26px">Sign in</h1><p class="small mute">I am a</p>
+ <div class="roles"><button class="role ${u.role==="farmer"?"on":""}" data-act="pickrole" data-v="farmer"><b>Farmer</b><span>Sell on contract, get paid securely</span></button><button class="role ${u.role==="buyer"?"on":""}" data-act="pickrole" data-v="buyer"><b>Buyer</b><span>Mill, trader or processor</span></button></div>
+ <form data-form="login"><label class="f">Mobile number<input type="tel" id="mobile" inputmode="numeric" value="${u.role==="farmer"?"98xxxxxx21":"01xxxxxx90"}"></label>
+ <label class="f">${u.role==="farmer"?"Village or mandi":"Business name"}<input type="text" id="place" value="${u.role==="farmer"?"Panipat, Haryana":"Shree Agro Mills"}"></label>
+ ${u.sent?`<label class="f">OTP <span class="hint">(demo OTP: 4821)</span><input type="tel" id="otp" name="otp" inputmode="numeric" maxlength="4" value="4821" autocomplete="one-time-code"></label>
+ <div class="callout lock" style="margin-bottom:12px">${ic("shield")}<div>Identity check (eKYC) is simulated in this prototype.</div></div><div class="err" id="merr"></div><button class="btn wide" type="submit">Verify and continue</button>`:
+ `<button class="btn wide" type="button" data-act="sendotp">Send OTP</button>`}</form>
+ <p class="small mute" style="margin:14px 0 0">Prototype: you will be signed in as the demo ${u.role==="farmer"?"farmer, Ramesh Kumar":"buyer, Shree Agro Mills"}.</p></div>
+ <p class="small" style="text-align:center;margin-top:14px"><a href="#login" data-act="enter" data-v="${u.role}">Skip and open the demo account</a></p></div></div>`}
+
+/* ============ modals ============ */
+function openModal(html,big){$("#modal").innerHTML=`<div class="mback" data-act="mback"><div class="modal ${big?"big":""}" role="dialog" aria-modal="true">${html}</div></div>`;const f=$("#modal input:not([type=hidden]),#modal select");if(f&&!big&&window.innerWidth>720)f.focus()}
+const closeModal=()=>{$("#modal").innerHTML=""};
+const mact=(label,cancel=true)=>`<div class="err" id="merr"></div><div class="mact">${cancel?'<button type="button" class="btn ghost" data-act="close">Cancel</button>':""}<button class="btn" type="submit">${label}</button></div>`;
+function modalFor(key,c){
+ const v=value(c);
+ if(key==="sign")return`<form data-form="sign" data-id="${c.id}"><h2>Sign ${c.id}</h2><div class="kv"><span>Crop</span><span>${c.qty} q ${esc(c.crop)} (${c.grade})</span></div><div class="kv"><span>Price</span><span>${inr(c.price)} / q · total ${inr(v)}</span></div><div class="kv"><span>Deliver by</span><span>${fdate(c.deliverBy)}</span></div><div class="kv"><span>Payment</span><span>${c.advancePct}% advance, balance within ${c.payTerms}h</span></div>
+  <label class="f" style="margin-top:12px">OTP sent to ${esc(me().mobile)} <span class="hint">(demo OTP: 4821)</span><input type="tel" name="otp" inputmode="numeric" maxlength="4" value="4821"></label><label class="chk"><input type="checkbox" name="agree"><span>I have read the terms. I understand they lock when both sides sign.</span></label>${mact("Sign contract")}</form>`;
+ if(key==="fund")return`<form data-form="fund" data-id="${c.id}"><h2>Fund escrow</h2><p>Pay <b>${inr(v)}</b> into escrow. It stays protected until the contract progresses. You can only lose it back through the refund rules.</p><div class="callout info">${ic("info")}<div>Simulated UPI payment. No real money moves in this prototype.</div></div>${mact("Pay "+inr(v))}</form>`;
+ if(key==="dispatch")return`<form data-form="dispatch" data-id="${c.id}"><h2>Mark as dispatched</h2><p class="small mute">You will receive the ${c.advancePct}% advance (${inr(v*c.advancePct/100)}) when you confirm.</p><div class="fgrid"><label class="f">Vehicle number<input type="text" name="vehicle" value="HR 06 AB 4421" required></label><label class="f">Driver name<input type="text" name="driver" value="Sukhdev Singh" required></label></div>${mact("Confirm dispatch")}</form>`;
+ if(key==="receive")return`<form data-form="receive" data-id="${c.id}"><h2>Receive and weigh</h2><p class="small mute">Contracted ${c.qty} q. Payment follows the weighed quantity.</p><div class="fgrid"><label class="f">Weighed quantity (q)<input type="number" name="weighed" step="0.1" min="0.1" max="${(c.qty*1.05).toFixed(1)}" value="${c.qty}" required></label><label class="f">Moisture (%)<input type="number" name="moisture" step="0.1" min="0" max="40" value="11.4" required></label></div><p class="small mute">Spec: ${esc(c.quality)}</p>${mact("Record delivery")}</form>`;
+ if(key==="confirm")return`<form data-form="confirm" data-id="${c.id}"><h2>Confirm quality and release payment</h2><p>Release <b>${inr(c.final-c.escrow.released)}</b> to ${esc(person(c.farmerId).name)}.${c.delivery&&c.delivery.moisture>12?` <span style="color:var(--warn)">Moisture was recorded at ${c.delivery.moisture}%. If it is outside the spec, report an issue instead.</span>`:""}</p><label class="f">Rate this farmer<select name="rating"><option value="5">5 stars</option><option value="4">4 stars</option><option value="3">3 stars</option></select></label>${mact("Release payment")}</form>`;
+ if(key==="dispute")return`<form data-form="dispute" data-id="${c.id}"><h2>Report an issue</h2><p class="small mute">Escrow freezes while the case is reviewed. Contract fingerprint, delivery log and weighbridge slip are attached automatically.</p><label class="f">What went wrong<select name="reason">${REASONS[S.role].map(r=>`<option>${r}</option>`).join("")}</select></label><label class="f">Details <span class="hint">(optional)</span><textarea name="note" placeholder="Describe what happened"></textarea></label><label class="f">Photo evidence <span class="hint">(optional)</span><input type="file" id="evfile" accept="image/*" multiple></label>${mact("Raise issue")}</form>`;
+}
+function newContractModal(prefill={}){
+ const farmer=S.role==="farmer",pool=Object.values(BASE_PEOPLE).filter(p=>p.type===(farmer?"buyer":"farmer")),crops=Object.keys(CROPS),cr=prefill.crop||"Wheat";
+ const dflt=new Date(dAt(14)).toISOString().slice(0,10),min=new Date().toISOString().slice(0,10);
+ openModal(`<form data-form="newc" id="newc"><h2>New contract</h2>
+ <div class="ai-card"><div class="row"><b>${ic("scan")} Scan a paper agreement</b><span class="demo">Demo AI</span></div><p class="small mute" style="margin:4px 0 8px">Upload a photo of a handwritten or verbal-agreement note and AgriBond fills the form. Always check the values.</p><input type="file" id="scanfile" data-scan accept="image/*,.pdf" style="margin:0"><div id="scanres"></div></div>
+ <label class="f">${farmer?"Buyer":"Farmer"}<select name="party" id="f_party">${pool.map(p=>`<option value="${p.id}">${esc(p.name)} · score ${trustOf(p).score}</option>`).join("")}</select></label>
+ <div class="fgrid"><label class="f">Crop<select name="crop" id="f_crop">${crops.map(k=>`<option ${k===cr?"selected":""}>${k}</option>`).join("")}</select></label><label class="f">Grade<select name="grade" id="f_grade"><option>A</option><option>B</option><option>FAQ</option></select></label>
+ <label class="f">Quantity (quintal)<input type="number" name="qty" id="f_qty" min="1" step="0.5" value="${prefill.qty||20}" required></label><label class="f">Price per quintal (₹)<input type="number" name="price" id="f_price" min="1" value="${prefill.price||CROPS[cr].base}" required></label>
+ <label class="f">Deliver by<input type="date" name="deliver" id="f_deliver" min="${min}" value="${dflt}" required></label><label class="f">Advance on dispatch<select name="adv" id="f_adv"><option value="0">None</option><option value="10">10%</option><option value="20" selected>20%</option><option value="30">30%</option></select></label>
+ <label class="f">Payment after delivery<select name="pay" id="f_pay"><option value="24">24 hours</option><option value="48" selected>48 hours</option><option value="72">72 hours</option><option value="168">7 days</option></select></label><label class="f">Delivery route<input type="text" name="place" id="f_place" value="${farmer?"Panipat Mandi to buyer's gate":"Farm gate to Shree Agro Mills, Karnal"}"></label></div>
+ <label class="f">Quality spec<textarea name="quality" id="f_quality">Moisture up to 12%, foreign matter up to 2%</textarea></label>
+ <div class="ai-card" id="fair"></div>${mact("Create draft")}</form>`,true);
+ updFair()}
+function updFair(){const f=$("#newc");if(!f)return;const g=n=>f.elements[n]?f.elements[n].value:"";
+ const days=Math.round((new Date(g("deliver")+"T00:00:00")-sod(Date.now()))/DAY);
+ const r=priceCheck(g("crop"),+g("price"),+g("pay"),+g("adv"),isNaN(days)?null:days);
+ $("#fair").innerHTML=`<div class="row"><b>Price and terms check</b><span class="demo">Rule-based</span></div><ul class="fair">${r.map(x=>`<li>${ic(x.t==="ok"?"check":x.t==="warn"?"alert":"info")}<span style="color:var(--${x.t==="ok"?"ok":x.t==="warn"?"warn":"info"})">${esc(x.x)}</span></li>`).join("")}</ul><div class="small mute" style="margin-top:6px">Total value: <b>${inr((+g("qty")||0)*(+g("price")||0))}</b></div>`}
+function mockScan(name){const n=name.toLowerCase(),sd=[...n].reduce((a,ch)=>(a*31+ch.charCodeAt(0))>>>0,5),keys=Object.keys(CROPS);
+ const crop=keys.find(k=>n.includes(k.toLowerCase().split(" ")[0]))||keys[sd%keys.length],qty=10+sd%41,price=Math.round(CROPS[crop].base*(.97+(sd%9)/100)/5)*5;
+ return{crop,qty,price,days:10+sd%14,adv:[0,10,20][sd%3],conf:61+sd%25}}
+function exportModal(){
+ if(S.plan!=="pro"){openModal(`<h2>CSV export is a Pro feature</h2><p>Export your ledger for your accountant or bank. Upgrade to Pro to turn it on. This is a demo upgrade, no payment is taken.</p><div class="mact"><button class="btn ghost" data-act="close">Not now</button><button class="btn" data-act="gopro">See Pro plan</button></div>`);return}
+ const rows=[["ID","Crop","Grade","Quantity (q)","Price per q","Value","Counterparty","Status","Deliver by","Escrow held","Paid out"],...mine().map(c=>[c.id,c.crop,c.grade,c.qty,c.price,value(c),other(c).name,STAT[status(c)][0],fdate(c.deliverBy),c.escrow.held,c.escrow.released])];
+ window._csv=rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(",")).join("\n");
+ openModal(`<h2>Export ledger (CSV)</h2><p class="small mute">Copy this into a spreadsheet and save it as a .csv file.</p><textarea id="csvbox" readonly style="min-height:180px;font-family:var(--mono);font-size:12px">${esc(window._csv)}</textarea><div class="mact"><button class="btn ghost" data-act="close">Close</button><button class="btn" data-act="copycsv">${ic("copy")}Copy CSV</button></div>`,true)}
+function upgradeModal(why){openModal(`<h2>Free plan limit reached</h2><p>${why}</p><div class="mact"><button class="btn ghost" data-act="close">Not now</button><button class="btn" data-act="gopro">See Pro plan</button></div>`)}
+
+/* ============ chat ============ */
+function renderChat(){
+ const el=$("#chat"),r=routeName();if(!S.role||["","welcome","login"].includes(r)){el.innerHTML="";return}
+ if(!S.chat.open){el.innerHTML=`<button class="fab" data-act="chatopen" aria-label="Open Ask AgriBond">${ic("chat")}<span>Ask AgriBond</span></button>`;return}
+ const Q=S.role==="farmer"?["What should I do next?","What payments are due?","Wheat MSP?","Which schemes fit me?"]:["What should I do next?","What payments are due?","Wheat price today?","How does escrow work?"];
+ el.innerHTML=`<div class="chatp" role="dialog" aria-label="Ask AgriBond"><div class="chath"><span>Ask AgriBond</span><button data-act="chatclose" aria-label="Close">${ic("x")}</button></div>
+ <div class="chatm" id="chatm">${S.chat.msgs.length?"":`<div class="msg a">Ask about your contracts, payments, mandi prices, MSP or schemes. I summarise your own records and don't give legal, tax or financial advice.<br><span class="demo" style="display:inline-block;margin-top:6px">Demo AI</span></div>`}
+ ${S.chat.msgs.map(m=>`<div class="msg ${m.role==="user"?"u":"a"}">${esc(m.text)}${m.role!=="user"?`<div><span class="demo" style="display:inline-block;margin-top:6px">Demo AI</span></div>`:""}${m.sources&&m.sources.length?`<div class="srcs">${m.sources.map(s=>`<a href="${s.u}" target="_blank" rel="noopener">${esc(s.t)}</a>`).join("")}</div>`:""}</div>`).join("")}
+ ${S.chat.busy?'<div class="msg a"><span class="spin"></span> Thinking…</div>':""}</div>
+ <div class="chatq">${Q.map(q=>`<button data-act="askq" data-q="${esc(q)}">${q}</button>`).join("")}</div>
+ <form class="chati" data-form="chat"><input type="text" id="chatin" placeholder="Ask a question" autocomplete="off" aria-label="Question"><button class="btn" type="submit" ${S.chat.busy?"disabled":""}>Send</button></form></div>`;
+ const m=$("#chatm");if(m)m.scrollTop=m.scrollHeight;const i=$("#chatin");if(i&&window.innerWidth>720)i.focus()}
+function sendChat(q){q=q.trim();if(!q||S.chat.busy)return;S.chat.msgs.push({role:"user",text:q});S.chat.busy=true;renderChat();
+ setTimeout(()=>{const a=ask(q);S.chat.msgs.push({role:"a",text:a.text,sources:a.sources});S.chat.busy=false;renderChat()},650)}
+
+/* ============ render ============ */
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");clearTimeout(toast._t);toast._t=setTimeout(()=>e.classList.remove("show"),2400)}
+function viewFor(r){
+ if(r==="dashboard")return dashboard();if(r==="contracts")return contractsView();if(r==="market")return marketView();
+ if(r==="schemes")return S.role==="farmer"?schemesView():null;if(r==="trust")return trustView();if(r==="plan")return planView();
+ if(r.startsWith("contract-"))return detail(r.slice(9));return null}
+function render(){
+ const r=routeName(),pub=["welcome","login"];
+ if(!r){location.hash=S.role?"dashboard":"welcome";return}
+ if(!S.role&&!pub.includes(r)){location.hash="login";return}
+ if(S.role&&r==="login"){location.hash="dashboard";return}
+ const y=window.scrollY;let html;
+ if(r==="welcome")html=landing();else if(r==="login")html=loginView();
+ else{const v=viewFor(r);if(v==null){location.hash="dashboard";return}html=shell(r,v)}
+ $("#app").innerHTML=html;renderChat();
+ if(r===lastRoute)window.scrollTo(0,y);else window.scrollTo(0,0);lastRoute=r;
+ if(r==="market")bindMarket()}
+/* ============ events ============ */
+const A={};
+const simDefaults=(c,key,p)=>key==="dispatch"?{vehicle:"HR 55 CD 1280",driver:"Rakesh Yadav"}:key==="receive"?{weighed:c.qty,moisture:11.4}:key==="confirm"?{rating:4}:key==="resolve"?{type:p.type}:{};
+A.open=el=>{location.hash="contract-"+el.dataset.id};
+A.role=el=>{S.role=el.dataset.v;S.ui.bell=S.ui.menu=false;save();render()};
+A.bell=()=>{S.ui.bell=!S.ui.bell;S.ui.menu=false;render()};
+A.menu=()=>{S.ui.menu=!S.ui.menu;S.ui.bell=false;render()};
+A.readall=()=>{S.notifs.forEach(n=>{if(n.to===S.role)n.read=true});save();render()};
+A.readone=el=>{const n=S.notifs.find(x=>String(x.id)===el.dataset.id);if(n)n.read=true;S.ui.bell=false;save();render()};
+A.reset=()=>{reset();location.hash==="#welcome"?render():location.hash="welcome";toast("Demo data reset")};
+A.signout=()=>{S.role=null;S.ui.menu=false;save();location.hash==="#welcome"?render():location.hash="welcome"};
+A.close=()=>closeModal();A.mback=()=>closeModal();
+A.do=el=>{const c=byId(el.dataset.id);openModal(modalFor(el.dataset.key,c))};
+A.report=el=>{openModal(modalFor("dispute",byId(el.dataset.id)))};
+A.sim=el=>{const c=byId(el.dataset.id);act(c.id,el.dataset.key,el.dataset.as,simDefaults(c,el.dataset.key,el.dataset));toast("Demo step applied");render()};
+A.verify=el=>{const c=byId(el.dataset.id),ok=sha256(terms(c))===c.lockedHash;$("#integ").innerHTML=`<div class="callout ${ok?"ok":"bad"}" style="margin-top:10px">${ic(ok?"check":"alert")}<div>${ok?"Fingerprint matches. The terms are exactly what both sides signed.":"Fingerprint does not match. The terms were changed after signing."}</div></div>`};
+A.tamper=el=>{const c=byId(el.dataset.id),fake={...c,price:c.price+100},h=sha256(terms(fake));$("#integ").innerHTML=`<div class="callout bad" style="margin-top:10px">${ic("alert")}<div><b>Tamper test (nothing was saved).</b> If someone changed the price to ${inr(fake.price)}, the fingerprint would become <span class="mono">${h.slice(0,16)}…</span> instead of <span class="mono">${c.lockedHash.slice(0,16)}…</span>, and the contract would be flagged as altered.</div></div>`};
+A.speak=el=>{const c=byId(el.dataset.id),hi=el.dataset.lang==="hi";if(!("speechSynthesis" in window)){toast("Read aloud is not supported on this device");return}
+ try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(buildSummary(c,el.dataset.lang));u.lang=hi?"hi-IN":"en-IN";speechSynthesis.speak(u);toast(hi?"सारांश सुनाया जा रहा है":"Reading the summary aloud")}catch(err){toast("Read aloud is not available here")}};
+A.newc=el=>{const open=mine().filter(c=>status(c)!=="completed").length;
+ if(S.plan==="free"&&open>=5){upgradeModal("The Free plan includes 5 open contracts. Close or complete one, or upgrade to Pro for unlimited contracts.");return}
+ newContractModal({crop:el.dataset.crop})};
+A.usescan=()=>{if(!_scan)return;const f=$("#newc");f.elements.crop.value=_scan.crop;f.elements.qty.value=_scan.qty;f.elements.price.value=_scan.price;f.elements.deliver.value=new Date(dAt(_scan.days)).toISOString().slice(0,10);f.elements.adv.value=String(_scan.adv);updFair();toast("Form filled. Check each value.")};
+A.discover=()=>{S.ui.disc="loading";render();setTimeout(()=>{S.ui.disc=[{t:"myScheme (official portal)",u:"https://www.myscheme.gov.in/"},{t:"Dept. of Agriculture & Farmers Welfare",u:"https://agriwelfare.gov.in/"}];if(routeName()==="schemes")render()},1200)};
+A.export=()=>exportModal();
+A.copycsv=()=>{const b=$("#csvbox");b.select();(navigator.clipboard?navigator.clipboard.writeText(window._csv):Promise.reject()).then(()=>toast("CSV copied")).catch(()=>{try{document.execCommand("copy");toast("CSV copied")}catch(e){toast("Select the text and copy it")}})};
+A.gopro=()=>{closeModal();location.hash="plan"};
+A.setplan=el=>{S.plan=el.dataset.v;save();render();toast(S.plan==="pro"?"Pro plan on (demo)":"Back on the Free plan")};
+A.cfilter=el=>{S.ui.cfilter=el.dataset.v;render()};
+A.mcrop=el=>{S.ui.mcrop=el.dataset.v;render()};
+A.pickrole=el=>{S.ui.login={role:el.dataset.v,sent:false};render()};
+A.sendotp=()=>{S.ui.login.sent=true;render();toast("OTP sent (demo OTP: 4821)")};
+A.start=el=>{S.ui.login={role:el.dataset.v,sent:false}};
+A.enter=(el,e)=>{e.preventDefault();S.role=el.dataset.v;save();toast("Signed in to the demo account");location.hash==="#dashboard"?render():location.hash="dashboard"};
+A.chatopen=()=>{S.chat.open=true;renderChat()};
+A.chatclose=()=>{S.chat.open=false;renderChat()};
+A.askq=el=>sendChat(el.dataset.q);
+
+document.addEventListener("click",e=>{
+ let closed=false;if(!e.target.closest(".pop-wrap")&&(S.ui.bell||S.ui.menu)){S.ui.bell=S.ui.menu=false;closed=true}
+ const el=e.target.closest("[data-act]");
+ if(el){const a=el.dataset.act;if(a==="mback"&&e.target!==el){if(closed)render();return}if(A[a]){A[a](el,e);return}}
+ if(closed)render()});
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"&&$("#modal").innerHTML)closeModal();
+ if(e.key==="Enter"&&e.target.matches&&e.target.matches('tr[data-act="open"]'))A.open(e.target)});
+document.addEventListener("input",e=>{
+ if(e.target.id==="csearch"){S.ui.csearch=e.target.value;$("#ledgerWrap").innerHTML=ledger(filterList(sortUrgent(mine())));return}
+ if(e.target.closest("#newc"))updFair()});
+document.addEventListener("change",e=>{
+ const t=e.target;
+ if(t.matches&&t.matches("[data-scan]")&&t.files&&t.files[0]){
+  const res=$("#scanres");if(!res)return;
+  if(S.plan==="free"&&S.aiUsed>=3){res.innerHTML=`<div class="callout warn" style="margin-top:8px">${ic("alert")}<div>You have used all 3 free scans. <button type="button" class="btn sm" data-act="gopro">See Pro plan</button></div></div>`;return}
+  res.innerHTML='<p class="small" style="margin:8px 0 0"><span class="spin"></span> Reading the document…</p>';const name=t.files[0].name;
+  setTimeout(()=>{const r=$("#scanres");if(!r)return;S.aiUsed++;save();_scan=mockScan(name);
+   r.innerHTML=`<div class="ai-card" style="background:var(--surface)"><div class="row"><b>Demo extraction, not real data</b><span class="demo">Demo AI</span></div><dl><dt>Crop</dt><dd>${_scan.crop}</dd><dt>Quantity</dt><dd>${_scan.qty} q</dd><dt>Price</dt><dd>${inr(_scan.price)} / q</dd><dt>Deliver in</dt><dd>${_scan.days} days</dd><dt>Confidence (demo)</dt><dd>${_scan.conf}%</dd></dl><p class="tiny mute">No AI reads your file in this prototype. These values are generated for demonstration. Edit every field before saving.</p><button type="button" class="btn sm" data-act="usescan">Use these values</button></div>`},900);return}
+ if(t.id==="f_crop"){const f=$("#newc");f.elements.price.value=CROPS[t.value].base;updFair();return}
+ if(t.dataset&&t.dataset.bind){const k=t.dataset.bind;if(k==="dfilter")S.ui.dfilter=t.value;else if(k==="land")S.land=Math.max(0,+t.value||0);else if(k==="state")S.state=t.value;save();render()}});
+
+const FORMS={
+ sign(f,d){const err=m=>$("#merr").textContent=m;if(d.otp!=="4821")return err("That OTP is wrong. Use the demo OTP 4821.");if(!d.agree)return err("Tick the box to confirm you have read the terms.");
+  act(f.dataset.id,"sign",S.role);closeModal();toast(byId(f.dataset.id).stage>=1?"Both signed. Terms are locked":"You signed the contract");render()},
+ fund(f){act(f.dataset.id,"fund","buyer");closeModal();toast("Escrow funded (simulated)");render()},
+ dispatch(f,d){act(f.dataset.id,"dispatch","farmer",{vehicle:d.vehicle.toUpperCase(),driver:d.driver});closeModal();toast("Dispatched. Advance released");render()},
+ receive(f,d){act(f.dataset.id,"receive","buyer",{weighed:d.weighed,moisture:d.moisture});closeModal();toast("Delivery recorded");render()},
+ confirm(f,d){act(f.dataset.id,"confirm","buyer",{rating:+d.rating});closeModal();toast("Payment released (simulated)");render()},
+ dispute(f,d){const files=[...(($("#evfile")||{}).files||[])].map(x=>x.name);act(f.dataset.id,"dispute",S.role,{reason:d.reason,note:d.note,files});closeModal();toast("Issue raised. Escrow is frozen");render()},
+ newc(f,d){const err=m=>$("#merr").textContent=m,qty=+d.qty,price=+d.price;
+  if(!(qty>0)||!(price>0))return err("Enter a quantity and price above zero.");const dl=new Date(d.deliver+"T00:00:00").getTime();if(isNaN(dl)||dl<sod(Date.now()))return err("Pick a delivery date that is today or later.");
+  const farmer=S.role==="farmer",id="AB-"+(Math.max(...S.contracts.map(c=>+c.id.slice(3)))+1);
+  const c={id,crop:d.crop,grade:d.grade,qty,price,farmerId:farmer?"F1":d.party,buyerId:farmer?d.party:"B1",deliverBy:dl,place:d.place||"To be agreed",quality:d.quality||"As agreed",advancePct:+d.adv,payTerms:+d.pay,created:Date.now(),sig:{f:null,b:null},stage:0,escrow:{held:0,released:0,refunded:0},times:{},vehicle:null,delivery:null,dispute:null,final:null,rated:null,log:[L(Date.now(),farmer?"F":"B",`${me().name} drafted this contract`)],tx:[]};
+  S.contracts.unshift(c);notify(otherRole(S.role),`${me().name} proposed contract ${id}: ${qty} q ${d.crop}`,"contract-"+id);save();closeModal();toast("Draft created. Sign to lock it");location.hash="contract-"+id},
+ login(f,d){if(d.otp!=="4821"){$("#merr").textContent="That OTP is wrong. Use the demo OTP 4821.";return}S.role=S.ui.login.role;save();toast("Verified (simulated). Welcome");location.hash="dashboard"},
+ chat(f){const i=$("#chatin");sendChat(i.value)}
+};
+document.addEventListener("submit",e=>{const f=e.target.closest("form[data-form]");if(!f)return;e.preventDefault();const fn=FORMS[f.dataset.form];if(fn)fn(f,Object.fromEntries(new FormData(f)))});
+
+load();
+window.addEventListener("hashchange",()=>{closeModal();render()});
+render();
+</script>
